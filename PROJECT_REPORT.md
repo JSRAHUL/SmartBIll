@@ -9,12 +9,12 @@
 
 | Field | Details |
 |---|---|
-| **Name** | RAHUL (J S RAHUL) |
-| **USN** | [Provide your USN] |
-| **Class/Section** | CSE-PWC(A) |
+| **Name** | J S Rahul |
+| **USN** | 25BTRPW048 |
+| **Class/Section** | CSE-PWC-A |
 | **Subject Name** | Python Programming |
-| **Faculty Name** | [Your Faculty Name] |
-| **Date of Submission** | 08/09/2026 |
+| **Faculty Name** | Ms. Sujithra G |
+| **Date of Submission** | 10/09/2026 |
 | **Project Topic** | SmartBill – Smart Store Billing and Inventory Management System |
 | **GitHub Link** | [https://github.com/JSRAHUL/SmartBIll](https://github.com/JSRAHUL/SmartBIll) |
 
@@ -212,7 +212,7 @@ def compute_bill_financials(cart):
              SMART STORE BILLING & INVENTORY SYSTEM
              123 College Road, Silicon Corridor | Phone: +91 98765 43210
 ==========================================================================
- Bill No  : BILL-20260908-0001           Date : 08/09/2026
+ Bill No  : BILL-20260908-0001           Date : 10/09/2026
  Customer : Priya Sharma                 Time : 11:35:00
  Phone    : 9876543210
 --------------------------------------------------------------------------
@@ -253,7 +253,7 @@ Overall, the project demonstrates how foundational programming techniques taught
 ---
 
 **Project Topic:** SmartBill – Smart Store Billing and Inventory Management System  
-**Student:** RAHUL (J S RAHUL)  
-**USN:** [Provide your USN]  
-**Class/Section:** CSE-PWC(A)  
-**Faculty Guide:** [Your Faculty Name]  
+**Student:** J S Rahul  
+**USN:** 25BTRPW048  
+**Class/Section:** CSE-PWC-A  
+**Faculty Guide:** Ms. Sujithra G  
