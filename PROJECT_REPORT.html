@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Python Programming Mini Project Report - SmartBill</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 20mm 15mm 20mm 15mm;
+      @bottom-left {
+        content: "Python Programming Mini Project Report";
+        font-family: Arial, sans-serif;
+        font-size: 9pt;
+        color: #555;
+      }
+      @bottom-right {
+        content: counter(page);
+        font-family: Arial, sans-serif;
+        font-size: 9pt;
+        color: #555;
+      }
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+      color: #111;
+      line-height: 1.5;
+      font-size: 11pt;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    .page {
+      page-break-after: always;
+      position: relative;
+      min-height: 250mm;
+      padding-bottom: 30px;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    .page-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 9pt;
+      color: #666;
+      border-top: 1px solid #ccc;
+      padding-top: 6px;
+    }
+
+    /* Cover Page */
+    .cover-header {
+      text-align: center;
+      margin-top: 30px;
+      margin-bottom: 40px;
+    }
+
+    .institution-logo {
+      font-size: 26pt;
+      font-weight: 900;
+      color: #0c2340;
+      letter-spacing: 1px;
+    }
+
+    .institution-logo span {
+      color: #0072ce;
+    }
+
+    .faculty-title {
+      font-size: 10pt;
+      text-transform: uppercase;
+      color: #444;
+      font-weight: 600;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .report-title-block {
+      text-align: center;
+      margin: 50px 0;
+    }
+
+    .school-title {
+      font-size: 18pt;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 8px;
+    }
+
+    .degree-title {
+      font-size: 14pt;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 25px;
+    }
+
+    .subject-title {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #0c2340;
+      margin-bottom: 6px;
+    }
+
+    .sub-title {
+      font-size: 13pt;
+      font-weight: 600;
+      color: #444;
+    }
+
+    /* Tables */
+    table.meta-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 40px;
+      font-size: 11pt;
+    }
+
+    table.meta-table td {
+      border: 1px solid #999;
+      padding: 12px 16px;
+    }
+
+    table.meta-table td:first-child {
+      font-weight: 700;
+      width: 32%;
+      background: #fbfbfb;
+    }
+
+    table.toc-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 11pt;
+    }
+
+    table.toc-table th, table.toc-table td {
+      border: 1px solid #999;
+      padding: 10px 14px;
+    }
+
+    table.toc-table th {
+      background: #f2f2f2;
+      font-weight: 700;
+    }
+
+    table.toc-table td:first-child {
+      text-align: center;
+      width: 12%;
+    }
+
+    table.toc-table td:last-child {
+      text-align: center;
+      width: 18%;
+    }
+
+    /* Content Typography */
+    h1 {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #0c2340;
+      margin-top: 0;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #111;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    h3 {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: #222;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-top: 4px;
+      margin-bottom: 14px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+      text-align: justify;
+    }
+
+    .concept-title {
+      font-weight: 700;
+      color: #0c2340;
+    }
+
+    /* Code Snippets */
+    .code-container {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 8.5pt;
+      padding: 14px;
+      border-radius: 4px;
+      overflow-x: auto;
+      line-height: 1.35;
+      margin: 12px 0;
+    }
+
+    .code-container pre {
+      margin: 0;
+    }
+
+    .code-line-num {
+      color: #858585;
+      display: inline-block;
+      width: 32px;
+      user-select: none;
+    }
+
+    .code-keyword { color: #569cd6; }
+    .code-string { color: #ce9178; }
+    .code-comment { color: #6a9955; font-style: italic; }
+    .code-func { color: #dcdcaa; }
+
+    /* Flowchart styles */
+    .flowchart-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin: 20px auto;
+      max-width: 380px;
+    }
+
+    .flow-box {
+      width: 100%;
+      border: 1.5px solid #222;
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+      font-size: 10pt;
+      font-weight: 600;
+      background: #fff;
+      box-shadow: 1px 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .flow-oval {
+      width: 60%;
+      border: 1.5px solid #222;
+      border-radius: 20px;
+      padding: 8px;
+      text-align: center;
+      font-weight: 700;
+      background: #f8f9fa;
+    }
+
+    .flow-arrow {
+      font-size: 14pt;
+      color: #222;
+      line-height: 1;
+    }
+
+    .flow-branch {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      gap: 12px;
+    }
+
+    /* Output Console Display */
+    .output-box {
+      background: #fafafa;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 12px;
+      font-family: "Courier New", Courier, monospace;
+      font-size: 9pt;
+      line-height: 1.35;
+      margin-bottom: 14px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 1: COVER PAGE                                                    -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <div class="cover-header">
+      <div class="institution-logo">JGi <span>JAIN</span></div>
+      <div class="faculty-title">Faculty of Engineering and Technology</div>
+      <div style="font-size: 9pt; color: #666; text-transform: uppercase; margin-top: 2px;">Deemed-to-be University</div>
+    </div>
+
+    <div class="report-title-block">
+      <div class="school-title">School of Computer Science and Engineering</div>
+      <div class="degree-title">B. Tech CSE</div>
+      <div class="subject-title">Python Programming</div>
+      <div class="sub-title">Mini Project Report</div>
+    </div>
+
+    <table class="meta-table">
+      <tr>
+        <td>Name</td>
+        <td>RAHUL (J S RAHUL)</td>
+      </tr>
+      <tr>
+        <td>USN</td>
+        <td>25BTRPW043 (Provide your USN)</td>
+      </tr>
+      <tr>
+        <td>Class/Section</td>
+        <td>CSE-PWC(A)</td>
+      </tr>
+      <tr>
+        <td>Subject Name</td>
+        <td>Python Programming</td>
+      </tr>
+      <tr>
+        <td>Faculty Name</td>
+        <td>Ms. Sujithra G (or your faculty guide)</td>
+      </tr>
+      <tr>
+        <td>Date of Report Submission</td>
+        <td>08/09/2026</td>
+      </tr>
+      <tr>
+        <td>Project Topic</td>
+        <td>SmartBill – Smart Store Billing and Inventory Management System</td>
+      </tr>
+      <tr>
+        <td>GitHub Link</td>
+        <td><a href="https://github.com/JSRAHUL/SmartBIll" style="color: #0072ce; text-decoration: none;">https://github.com/JSRAHUL/SmartBIll</a></td>
+      </tr>
+    </table>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>1</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 2: TABLE OF CONTENT                                              -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h1 style="margin-top: 20px; margin-bottom: 24px;">Table of Content</h1>
+
+    <table class="toc-table">
+      <thead>
+        <tr>
+          <th>S.No</th>
+          <th style="text-align: left;">Topic</th>
+          <th>Page No</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td style="text-align: left;">Introduction</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td style="text-align: left;">Problem Statement</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td style="text-align: left;">Objectives</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td style="text-align: left;">Project Description</td>
+          <td>4</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td style="text-align: left;">Concepts Used in the Program</td>
+          <td>4–5</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td style="text-align: left;">Algorithm</td>
+          <td>5</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td style="text-align: left;">Flow Chart</td>
+          <td>6</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td style="text-align: left;">Python Program</td>
+          <td>7–9</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td style="text-align: left;">Output</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td style="text-align: left;">Conclusion</td>
+          <td>11</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>2</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 3: INTRODUCTION, PROBLEM STATEMENT, OBJECTIVES                   -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>1. Introduction</h2>
+    <p>
+      In retail commerce, generating accurate invoices and managing inventory are critical everyday computational tasks. 
+      Traditional billing practices that involve manual calculations and handwritten slips frequently result in computational errors, 
+      inaccurate tax applications, lost transaction history, and accidental overselling when stock levels are depleted.
+      To address these challenges, <strong>SmartBill</strong> is designed and developed as a comprehensive retail billing 
+      and stock management system implemented in Python.
+    </p>
+    <p>
+      The application seamlessly integrates product cataloguing, shopping cart management, automatic multi-tiered discounting, 
+      itemized Goods and Services Tax (GST) computation, payment processing, real-time inventory deduction, and sales analytics. 
+      The system is implemented using clean modular functions and relational persistence (JSON and SQLite), separating business logic 
+      from user interface operations.
+    </p>
+    <p>
+      The program incorporates defensive input validation and robust exception handling to ensure that non-numeric entries, negative numbers, 
+      invalid mobile numbers, and insufficient inventory attempts are handled gracefully without application crashes. 
+      These features demonstrate the practical application of foundational and intermediate Python programming principles in solving a real-world commercial problem.
+    </p>
+
+    <h2>2. Problem Statement</h2>
+    <p>
+      Design and develop a Bill Generator application using Python that generates a customer bill for purchased products. 
+      The program should allow users to enter product details, quantity, and price, calculate the total amount, apply GST (if applicable), 
+      and display a formatted bill. The system must prevent negative inventory, support item-level and bill-value discounts, 
+      handle multiple payment methods, and maintain persistent historical records.
+    </p>
+
+    <h2>3. Objectives</h2>
+    <ul>
+      <li>To develop a modular and interactive billing application using Python.</li>
+      <li>To maintain a persistent product catalogue containing product ID, name, category, price, stock, and GST rate.</li>
+      <li>To automatically retrieve product details and prices from the catalogue to eliminate manual cashier pricing errors.</li>
+      <li>To implement dual-tier discounts: item-level bulk quantity discounts and overall bill-value tiered discounts.</li>
+      <li>To calculate statutory GST accurately across varying tax slabs (5%, 12%, 18%) post-discount on the net taxable amount.</li>
+      <li>To implement real-time inventory synchronization by automatically decrementing stock upon successful payment.</li>
+      <li>To validate stock availability before purchase and prevent negative stock or overselling.</li>
+      <li>To calculate change due for cash payments and log digital payment methods (UPI, Card).</li>
+      <li>To record transaction history persistently and generate daily sales summaries and business analytics.</li>
+    </ul>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>3</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 4: PROJECT DESCRIPTION & CONCEPTS USED                           -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>4. Project Description</h2>
+    <p>
+      <strong>SmartBill</strong> is structured as a modular Python billing application. When the program initiates, it verifies and loads the persistent 
+      product catalogue and invoice records. If launched for the first time, it automatically bootstraps the database with realistic sample items across multiple retail categories 
+      including Electronics, Groceries, Stationery, Beverages, and Personal Care.
+    </p>
+    <p>
+      The user is presented with an organized main menu comprising options: Create New Bill, Product Catalogue, Manage Inventory, Bill History, 
+      Sales Summary, Search Product, and Exit. During bill creation, the application captures customer details (Name and 10-digit Phone Number) 
+      and auto-generates a unique invoice number along with system date and time timestamps.
+    </p>
+    <p>
+      Cashiers add products to an active cart by specifying Product IDs. The system checks available shelf stock, enforces maximum quantity limits, 
+      and computes line subtotals. When checking out, the calculation engine evaluates item bulk discounts and store-wide bill offers, computes 
+      itemized GST on net taxable values, processes payments with exact change calculation, atomically updates inventory stock, and renders a professional receipt.
+    </p>
+
+    <h2>5. Concepts Used in the Program</h2>
+    <p>
+      <span class="concept-title">Functions:</span> The program is structured into 24 single-responsibility modular functions such as 
+      <code>find_product_by_id()</code>, <code>compute_bill_financials()</code>, <code>calculate_item_quantity_discount()</code>, 
+      <code>calculate_bill_tier_discount()</code>, <code>print_receipt()</code>, and <code>initialize_data_files()</code>.
+    </p>
+    <p>
+      <span class="concept-title">Conditional Statements:</span> Extensive <code>if</code>, <code>elif</code>, and <code>else</code> blocks are utilized 
+      to evaluate menu choices, discount thresholds, GST tax slabs, payment modes, and inventory boundary limits.
+    </p>
+    <p>
+      <span class="concept-title">Loops:</span> <code>while</code> loops sustain continuous menu interactions and input-validation prompts until valid entries are provided. 
+      <code>for</code> loops iterate over catalogue lists, cart items, and completed bill records for financial aggregations.
+    </p>
+    <p>
+      <span class="concept-title">Exception Handling:</span> Defensive <code>try-except</code> constructs intercept <code>ValueError</code> during numeric casting 
+      and handle <code>IOError</code> / <code>json.JSONDecodeError</code> during file operations, preventing runtime program termination.
+    </p>
+    <p>
+      <span class="concept-title">Data Structures (Lists and Dictionaries):</span> Python dictionaries model structured product entities and invoice records. 
+      Lists maintain the cart session, product collections, and historical ledgers.
+    </p>
+    <p>
+      <span class="concept-title">Arithmetic & Financial Operators:</span> Floating-point expressions compute line gross totals, tiered percentage discounts, 
+      taxable balances, GST collections, and cashier change returns.
+    </p>
+    <p>
+      <span class="concept-title">String Formatting:</span> Python f-strings with alignment and precision specifiers (e.g., <code>{price:&gt;10.2f}</code>, <code>{name:&lt;26}</code>) 
+      ensure professional receipt alignment and clean tabular console presentations.
+    </p>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>4</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 5: CONCEPTS (CONTINUED) & ALGORITHM                              -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>5. Concepts Used in the Program (Continued)</h2>
+    <p>
+      <span class="concept-title">File Handling & Data Persistence:</span> Built-in <code>json</code> and <code>sqlite3</code> modules serialize and deserialize 
+      catalogue states and transaction history, ensuring that product modifications and completed sales persist across system restarts.
+    </p>
+    <p>
+      <span class="concept-title">Date & Time Module:</span> The standard <code>datetime</code> module generates live date stamps, time stamps, 
+      and formatted sequential invoice identifiers (<code>BILL-YYYYMMDD-XXXX</code>).
+    </p>
+    <p>
+      <span class="concept-title">Validation & Defensive Programming:</span> The system validates customer mobile numbers (must be exactly 10 digits), 
+      ensures non-negative prices, verifies positive non-zero quantities, and ensures tendered cash meets or exceeds the grand total.
+    </p>
+
+    <h2>6. Algorithm</h2>
+    <ol>
+      <li>Start the program and initialize data persistence files (<code>products.json</code> and <code>bills.json</code> / <code>database.db</code>).</li>
+      <li>Display the SmartBill Main Menu with options: Create Bill, Product Catalogue, Inventory, Bill History, Sales Summary, Search, and Exit.</li>
+      <li>Prompt the user to enter a menu choice (1–7).</li>
+      <li><strong>If Create New Bill is selected:</strong>
+        <ol style="list-style-type: lower-alpha;">
+          <li>Prompt for customer name and 10-digit mobile number.</li>
+          <li>Generate a unique invoice number, system date, and system time.</li>
+          <li>Prompt for Product ID and search the catalogue. If not found or out of stock, notify the user.</li>
+          <li>Prompt for quantity; verify that <code>requested_quantity &le; available_stock</code>.</li>
+          <li>Add item to cart and calculate item subtotal. Allow cashier to add more items, modify quantities, or remove items.</li>
+          <li>When proceeding to checkout, compute item quantity discounts and overall bill-tier discounts.</li>
+          <li>Distribute bill discounts proportionally across line items to calculate line-level taxable values.</li>
+          <li>Compute GST per item based on its category GST rate (5%, 12%, 18%) and sum to find total GST.</li>
+          <li>Calculate Grand Total: <code>Grand Total = Net Taxable Value + Total GST</code>.</li>
+          <li>Prompt for payment method (Cash, UPI, Card). If Cash, input tender and compute <code>Change Due = Tender &minus; Grand Total</code>.</li>
+          <li>Atomically deduct purchased quantities from catalogue stock.</li>
+          <li>Save the invoice record to persistent storage and print the formatted receipt.</li>
+        </ol>
+      </li>
+      <li><strong>If Product Catalogue is selected:</strong> Allow viewing all items, adding new products, modifying prices/stock, or deleting products.</li>
+      <li><strong>If Manage Inventory is selected:</strong> Display stock levels, highlight low-stock items (&le; threshold), and allow quick restocking.</li>
+      <li><strong>If Bill History is selected:</strong> Display historical transaction summaries and permit receipt reprinting.</li>
+      <li><strong>If Sales Summary is selected:</strong> Aggregate total sales revenue, total GST collected, total discounts given, and top-selling products.</li>
+      <li><strong>If Search Product is selected:</strong> Perform case-insensitive substring search by product name, category, or ID.</li>
+      <li><strong>If Exit is selected:</strong> Display exit message and terminate program safely.</li>
+    </ol>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>5</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 6: FLOW CHART                                                    -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>7. Flow Chart</h2>
+
+    <div class="flowchart-wrap">
+      <div class="flow-oval">START</div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-box">Initialize Data Storage<br><small>(Load Products &amp; Invoices)</small></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-box">Display Main Menu<br><small>(1: Bill, 2: Catalogue, 3: Inventory, 4: History, 5: Sales, 6: Search, 7: Exit)</small></div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-box">Read &amp; Validate User Choice</div>
+      <div class="flow-arrow">&darr;</div>
+
+      <div class="flow-box" style="background: #f0f7ff; border-color: #0072ce;">
+        <strong>Selection Branching</strong><br>
+        • Choice 1 &rarr; Input Customer Info &amp; Enter Cart Session<br>
+        • Choice 2 &rarr; Manage Product Catalogue (CRUD)<br>
+        • Choice 3 &rarr; Inspect Stock &amp; Low-Stock Alerts<br>
+        • Choice 4 &rarr; Browse Invoices &amp; Reprint Receipt<br>
+        • Choice 5 &rarr; Generate Store Sales Analytics<br>
+        • Choice 6 &rarr; Search Catalogue by ID / Name / Category
+      </div>
+
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-box">
+        <strong>Billing Execution (Option 1)</strong><br>
+        Check Stock &rarr; Calculate Discounts &rarr; Compute GST &rarr; Process Payment &rarr; Deduct Stock &rarr; Save &amp; Print Bill
+      </div>
+
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-box">Return to Main Menu Loop?</div>
+      <div class="flow-arrow">&darr;</div>
+      <div class="flow-oval">END (Choice 7)</div>
+    </div>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>6</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 7: PYTHON PROGRAM (PAGE 1 OF 3)                                  -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>8. Python Program</h2>
+    <div style="font-size: 8.5pt; color: #555; margin-bottom: 6px;">Program Listing — Core Data Persistence &amp; Discount Logic</div>
+
+    <div class="code-container">
+<pre><span class="code-line-num">001</span><span class="code-keyword">import</span> os, json, datetime
+<span class="code-line-num">002</span>
+<span class="code-line-num">003</span><span class="code-comment"># Global File Paths and Currency Configuration</span>
+<span class="code-line-num">004</span>BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+<span class="code-line-num">005</span>PRODUCTS_FILE = os.path.join(BASE_DIR, <span class="code-string">"products.json"</span>)
+<span class="code-line-num">006</span>BILLS_FILE = os.path.join(BASE_DIR, <span class="code-string">"bills.json"</span>)
+<span class="code-line-num">007</span>CURRENCY = <span class="code-string">"Rs."</span>
+<span class="code-line-num">008</span>
+<span class="code-line-num">009</span><span class="code-keyword">def</span> <span class="code-func">load_products</span>():
+<span class="code-line-num">010</span>    <span class="code-string">"""Load product catalogue from persistent JSON storage."""</span>
+<span class="code-line-num">011</span>    <span class="code-keyword">try</span>:
+<span class="code-line-num">012</span>        <span class="code-keyword">with</span> open(PRODUCTS_FILE, <span class="code-string">"r"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+<span class="code-line-num">013</span>            <span class="code-keyword">return</span> json.load(f)
+<span class="code-line-num">014</span>    <span class="code-keyword">except</span> Exception:
+<span class="code-line-num">015</span>        <span class="code-keyword">return</span> []
+<span class="code-line-num">016</span>
+<span class="code-line-num">017</span><span class="code-keyword">def</span> <span class="code-func">save_products</span>(products):
+<span class="code-line-num">018</span>    <span class="code-string">"""Save product catalogue back to JSON file."""</span>
+<span class="code-line-num">019</span>    <span class="code-keyword">with</span> open(PRODUCTS_FILE, <span class="code-string">"w"</span>, encoding=<span class="code-string">"utf-8"</span>) <span class="code-keyword">as</span> f:
+<span class="code-line-num">020</span>        json.dump(products, f, indent=<span class="code-string">4</span>)
+<span class="code-line-num">021</span>
+<span class="code-line-num">022</span><span class="code-keyword">def</span> <span class="code-func">calculate_item_quantity_discount</span>(price, qty):
+<span class="code-line-num">023</span>    <span class="code-string">"""Apply item-level bulk purchase discount."""</span>
+<span class="code-line-num">024</span>    subtotal = price * qty
+<span class="code-line-num">025</span>    <span class="code-keyword">if</span> qty &gt;= <span class="code-string">10</span>:
+<span class="code-line-num">026</span>        rate = <span class="code-string">10.0</span>
+<span class="code-line-num">027</span>    <span class="code-keyword">elif</span> qty &gt;= <span class="code-string">5</span>:
+<span class="code-line-num">028</span>        rate = <span class="code-string">5.0</span>
+<span class="code-line-num">029</span>    <span class="code-keyword">else</span>:
+<span class="code-line-num">030</span>        rate = <span class="code-string">0.0</span>
+<span class="code-line-num">031</span>    discount_amt = round(subtotal * (rate / <span class="code-string">100.0</span>), <span class="code-string">2</span>)
+<span class="code-line-num">032</span>    <span class="code-keyword">return</span> rate, discount_amt
+<span class="code-line-num">033</span>
+<span class="code-line-num">034</span><span class="code-keyword">def</span> <span class="code-func">calculate_bill_tier_discount</span>(net_subtotal):
+<span class="code-line-num">035</span>    <span class="code-string">"""Apply tiered store-wide basket discount."""</span>
+<span class="code-line-num">036</span>    <span class="code-keyword">if</span> net_subtotal &gt;= <span class="code-string">5000</span>:
+<span class="code-line-num">037</span>        rate = <span class="code-string">15.0</span>
+<span class="code-line-num">038</span>    <span class="code-keyword">elif</span> net_subtotal &gt;= <span class="code-string">3000</span>:
+<span class="code-line-num">039</span>        rate = <span class="code-string">10.0</span>
+<span class="code-line-num">040</span>    <span class="code-keyword">elif</span> net_subtotal &gt;= <span class="code-string">1000</span>:
+<span class="code-line-num">041</span>        rate = <span class="code-string">5.0</span>
+<span class="code-line-num">042</span>    <span class="code-keyword">else</span>:
+<span class="code-line-num">043</span>        rate = <span class="code-string">0.0</span>
+<span class="code-line-num">044</span>    discount_amt = round(net_subtotal * (rate / <span class="code-string">100.0</span>), <span class="code-string">2</span>)
+<span class="code-line-num">045</span>    <span class="code-keyword">return</span> rate, discount_amt
+</pre>
+    </div>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>7</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 8: PYTHON PROGRAM (PAGE 2 OF 3)                                  -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>8. Python Program (Continued)</h2>
+    <div style="font-size: 8.5pt; color: #555; margin-bottom: 6px;">Program Listing — Financial Computation &amp; Multi-Slab GST Calculation</div>
+
+    <div class="code-container">
+<pre><span class="code-line-num">046</span><span class="code-keyword">def</span> <span class="code-func">compute_bill_financials</span>(cart):
+<span class="code-line-num">047</span>    <span class="code-string">"""Calculates gross subtotal, discounts, taxable value, GST, and grand total."""</span>
+<span class="code-line-num">048</span>    gross_subtotal = <span class="code-string">0.0</span>
+<span class="code-line-num">049</span>    total_qty_discount = <span class="code-string">0.0</span>
+<span class="code-line-num">050</span>    line_details = []
+<span class="code-line-num">051</span>
+<span class="code-line-num">052</span>    <span class="code-comment"># Step 1: Compute item-level gross and quantity discounts</span>
+<span class="code-line-num">053</span>    <span class="code-keyword">for</span> item <span class="code-keyword">in</span> cart:
+<span class="code-line-num">054</span>        line_gross = round(item[<span class="code-string">"price"</span>] * item[<span class="code-string">"qty"</span>], <span class="code-string">2</span>)
+<span class="code-line-num">055</span>        q_rate, q_disc = calculate_item_quantity_discount(item[<span class="code-string">"price"</span>], item[<span class="code-string">"qty"</span>])
+<span class="code-line-num">056</span>        line_after = line_gross - q_disc
+<span class="code-line-num">057</span>        gross_subtotal += line_gross
+<span class="code-line-num">058</span>        total_qty_discount += q_disc
+<span class="code-line-num">059</span>        line_details.append({<span class="code-string">"item"</span>: item, <span class="code-string">"gross"</span>: line_gross, <span class="code-string">"after"</span>: line_after, <span class="code-string">"disc"</span>: q_disc})
+<span class="code-line-num">060</span>
+<span class="code-line-num">061</span>    net_after_qty = gross_subtotal - total_qty_discount
+<span class="code-line-num">062</span>    b_rate, b_disc = calculate_bill_tier_discount(net_after_qty)
+<span class="code-line-num">063</span>    total_discount = round(total_qty_discount + b_disc, <span class="code-string">2</span>)
+<span class="code-line-num">064</span>    overall_taxable = round(gross_subtotal - total_discount, <span class="code-string">2</span>)
+<span class="code-line-num">065</span>
+<span class="code-line-num">066</span>    <span class="code-comment"># Step 2: Proportional allocation of bill discount to compute itemized GST</span>
+<span class="code-line-num">067</span>    total_gst = <span class="code-string">0.0</span>
+<span class="code-line-num">068</span>    processed_items = []
+<span class="code-line-num">069</span>    <span class="code-keyword">for</span> line <span class="code-keyword">in</span> line_details:
+<span class="code-line-num">070</span>        itm = line[<span class="code-string">"item"</span>]
+<span class="code-line-num">071</span>        share = round(b_disc * (line[<span class="code-string">"after"</span>] / net_after_qty), <span class="code-string">2</span>) <span class="code-keyword">if</span> net_after_qty &gt; <span class="code-string">0</span> <span class="code-keyword">else</span> <span class="code-string">0.0</span>
+<span class="code-line-num">072</span>        taxable = max(<span class="code-string">0.0</span>, round(line[<span class="code-string">"after"</span>] - share, <span class="code-string">2</span>))
+<span class="code-line-num">073</span>        gst_amt = round(taxable * (itm[<span class="code-string">"gst_rate"</span>] / <span class="code-string">100.0</span>), <span class="code-string">2</span>)
+<span class="code-line-num">074</span>        total_gst += gst_amt
+<span class="code-line-num">075</span>        processed_items.append({
+<span class="code-line-num">076</span>            <span class="code-string">"id"</span>: itm[<span class="code-string">"id"</span>], <span class="code-string">"name"</span>: itm[<span class="code-string">"name"</span>], <span class="code-string">"price"</span>: itm[<span class="code-string">"price"</span>],
+<span class="code-line-num">077</span>            <span class="code-string">"qty"</span>: itm[<span class="code-string">"qty"</span>], <span class="code-string">"taxable"</span>: taxable, <span class="code-string">"gst_rate"</span>: itm[<span class="code-string">"gst_rate"</span>],
+<span class="code-line-num">078</span>            <span class="code-string">"gst_amt"</span>: gst_amt, <span class="code-string">"item_total"</span>: round(taxable + gst_amt, <span class="code-string">2</span>)
+<span class="code-line-num">079</span>        })
+<span class="code-line-num">080</span>
+<span class="code-line-num">081</span>    grand_total = round(overall_taxable + total_gst, <span class="code-string">2</span>)
+<span class="code-line-num">082</span>    <span class="code-keyword">return</span> {
+<span class="code-line-num">083</span>        <span class="code-string">"subtotal"</span>: gross_subtotal, <span class="code-string">"qty_discount"</span>: total_qty_discount,
+<span class="code-line-num">084</span>        <span class="code-string">"bill_discount"</span>: b_disc, <span class="code-string">"total_discount"</span>: total_discount,
+<span class="code-line-num">085</span>        <span class="code-string">"taxable"</span>: overall_taxable, <span class="code-string">"gst"</span>: round(total_gst, <span class="code-string">2</span>),
+<span class="code-line-num">086</span>        <span class="code-string">"grand_total"</span>: grand_total, <span class="code-string">"items"</span>: processed_items
+<span class="code-line-num">087</span>    }
+</pre>
+    </div>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>8</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 9: PYTHON PROGRAM (PAGE 3 OF 3)                                  -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>8. Python Program (Continued)</h2>
+    <div style="font-size: 8.5pt; color: #555; margin-bottom: 6px;">Program Listing — Input Helpers &amp; Main Controller Loop</div>
+
+    <div class="code-container">
+<pre><span class="code-line-num">088</span><span class="code-keyword">def</span> <span class="code-func">input_int</span>(prompt, min_val=<span class="code-keyword">None</span>, max_val=<span class="code-keyword">None</span>):
+<span class="code-line-num">089</span>    <span class="code-string">"""Interactively prompts for a valid integer with error handling."""</span>
+<span class="code-line-num">090</span>    <span class="code-keyword">while</span> <span class="code-keyword">True</span>:
+<span class="code-line-num">091</span>        <span class="code-keyword">try</span>:
+<span class="code-line-num">092</span>            val = int(input(prompt).strip())
+<span class="code-line-num">093</span>            <span class="code-keyword">if</span> min_val <span class="code-keyword">is not None</span> <span class="code-keyword">and</span> val &lt; min_val:
+<span class="code-line-num">094</span>                print(f<span class="code-string">"  [!] Minimum value is {min_val}."</span>); <span class="code-keyword">continue</span>
+<span class="code-line-num">095</span>            <span class="code-keyword">if</span> max_val <span class="code-keyword">is not None</span> <span class="code-keyword">and</span> val &gt; max_val:
+<span class="code-line-num">096</span>                print(f<span class="code-string">"  [!] Maximum value is {max_val}."</span>); <span class="code-keyword">continue</span>
+<span class="code-line-num">097</span>            <span class="code-keyword">return</span> val
+<span class="code-line-num">098</span>        <span class="code-keyword">except</span> ValueError:
+<span class="code-line-num">099</span>            print(<span class="code-string">"  [!] Invalid input. Please enter a valid integer."</span>)
+<span class="code-line-num">100</span>
+<span class="code-line-num">101</span><span class="code-keyword">def</span> <span class="code-func">main</span>():
+<span class="code-line-num">102</span>    <span class="code-string">"""Main interactive loop of SmartBill."""</span>
+<span class="code-line-num">103</span>    initialize_data_files()
+<span class="code-line-num">104</span>    <span class="code-keyword">while</span> <span class="code-keyword">True</span>:
+<span class="code-line-num">105</span>        print(<span class="code-string">"\n"</span> + <span class="code-string">"="</span> * <span class="code-string">50</span>)
+<span class="code-line-num">106</span>        print(<span class="code-string">"           SMARTBILL SYSTEM - MAIN MENU"</span>)
+<span class="code-line-num">107</span>        print(<span class="code-string">"="</span> * <span class="code-string">50</span>)
+<span class="code-line-num">108</span>        print(<span class="code-string">"  [1] Create New Bill\n  [2] Product Catalogue\n  [3] Manage Inventory"</span>)
+<span class="code-line-num">109</span>        print(<span class="code-string">"  [4] Bill History\n  [5] Sales Summary\n  [6] Search Product\n  [7] Exit"</span>)
+<span class="code-line-num">110</span>        print(<span class="code-string">"="</span> * <span class="code-string">50</span>)
+<span class="code-line-num">111</span>        choice = input(<span class="code-string">"  Enter choice (1-7): "</span>).strip()
+<span class="code-line-num">112</span>        <span class="code-keyword">if</span> choice == <span class="code-string">'1'</span>: create_new_bill()
+<span class="code-line-num">113</span>        <span class="code-keyword">elif</span> choice == <span class="code-string">'2'</span>: menu_product_catalogue()
+<span class="code-line-num">114</span>        <span class="code-keyword">elif</span> choice == <span class="code-string">'3'</span>: menu_inventory()
+<span class="code-line-num">115</span>        <span class="code-keyword">elif</span> choice == <span class="code-string">'4'</span>: menu_bill_history()
+<span class="code-line-num">116</span>        <span class="code-keyword">elif</span> choice == <span class="code-string">'5'</span>: menu_sales_summary()
+<span class="code-line-num">117</span>        <span class="code-keyword">elif</span> choice == <span class="code-string">'6'</span>: menu_search_product()
+<span class="code-line-num">118</span>        <span class="code-keyword">elif</span> choice == <span class="code-string">'7'</span>: print(<span class="code-string">"\nThank you for using SmartBill!"</span>); <span class="code-keyword">break</span>
+</pre>
+    </div>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>9</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 10: SAMPLE OUTPUTS                                               -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>9. Output</h2>
+
+    <div style="font-size: 9pt; font-weight: 700; margin-bottom: 4px;">Sample Output 1 — Main Menu &amp; Catalogue</div>
+    <div class="output-box">==================================================
+           SMARTBILL SYSTEM - MAIN MENU
+==================================================
+  [1] Create New Bill
+  [2] Product Catalogue (View / Add / Edit / Remove)
+  [3] Manage Inventory (Stock levels & Restocking)
+  [4] Bill History (View Past Invoices & Reprint)
+  [5] Sales Summary & Business Analytics
+  [6] Search Product
+  [7] Exit
+==================================================
+  Enter choice (1-7): 2</div>
+
+    <div style="font-size: 9pt; font-weight: 700; margin-bottom: 4px;">Sample Output 2 — Product Catalogue Table with Stock Status</div>
+    <div class="output-box">======================================================================================
+                                  PRODUCT CATALOGUE                                   
+======================================================================================
+ID     Product Name                 Category       Price(Rs.)   Stock   GST% Status      
+--------------------------------------------------------------------------------------
+P101   Wireless Optical Mouse       Electronics        499.00      25  18.0% OK          
+P102   Mechanical Gaming Keyboard   Electronics       1899.00      15  18.0% OK          
+P104   A4 Spiral Notebook (200p)    Stationery          85.00      50  12.0% OK          
+P106   Royal Basmati Rice (5 kg)    Groceries          450.00      20   5.0% OK          
+P110   Herbal Hand Sanitizer (500m  Personal Care      110.00       4  18.0% LOW (4)     
+======================================================================================</div>
+
+    <div style="font-size: 9pt; font-weight: 700; margin-bottom: 4px;">Sample Output 3 — Generated Professional Customer Receipt</div>
+    <div class="output-box">==========================================================================
+                            SMARTBILL
+             SMART STORE BILLING & INVENTORY SYSTEM
+             123 College Road, Silicon Corridor | Phone: +91 98765 43210
+==========================================================================
+ Bill No  : BILL-20260908-0001           Date : 08/09/2026
+ Customer : Priya Sharma                 Time : 11:35:00
+ Phone    : 9876543210
+--------------------------------------------------------------------------
+ ID     Item Description            Qty    Price   GST%    Amount(Rs.)
+--------------------------------------------------------------------------
+ P101   Wireless Optical Mouse        5   499.00  18.0%        2517.20
+ P104   A4 Spiral Notebook (200p)    10    85.00  12.0%         771.12
+--------------------------------------------------------------------------
+ Gross Subtotal                                 : Rs.    3345.00
+ Quantity Bulk Discount                         : -Rs.    209.75
+ Store Offer (10% off on bill)                  : -Rs.    313.53
+ Total Discount Given                           : -Rs.    523.28
+ Net Taxable Value                              : Rs.    2821.72
+ Total GST Amount                               : Rs.     466.60
+==========================================================================
+ GRAND TOTAL                                    : Rs.    3288.32
+==========================================================================
+ Payment Mode : Cash                
+ Amount Paid  : Rs.  3500.00
+ Change Due   : Rs.   211.68
+==========================================================================
+                   Thank You for Shopping with SmartBill!
+==========================================================================</div>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>10</span>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- PAGE 11: CONCLUSION & SUBMISSION SIGN-OFF                             -->
+  <!-- ===================================================================== -->
+  <div class="page">
+    <h2>10. Conclusion</h2>
+    <p>
+      The <strong>SmartBill – Smart Store Billing and Inventory Management System</strong> successfully fulfills the academic objective of designing 
+      and developing an intelligent, robust, and real-world billing application in Python. Moving far beyond a basic calculator, 
+      the system demonstrates how automated store operations can eliminate manual pricing mistakes, enforce inventory constraints, 
+      and ensure statutory tax compliance.
+    </p>
+    <p>
+      The project highlights key Python programming principles including user-defined modular functions, exception handling, 
+      nested decision structures, persistent data serialization using JSON and SQLite, defensive input validation, and professional string formatting. 
+      The implementation of item-level bulk discounts alongside basket-value store offers provides a realistic commercial experience.
+    </p>
+    <p>
+      Real-time stock synchronization guarantees that shelf inventory automatically decrements upon successful checkout, preventing negative 
+      stock and providing early low-stock warnings to store managers. The application operates across both a fast command-line terminal 
+      and a modern browser-based web dashboard.
+    </p>
+    <p>
+      Overall, the project demonstrates how foundational programming techniques taught in the computer science curriculum 
+      can be synthesized to create an industry-relevant software product. Future enhancements can expand the platform 
+      with hardware barcode scanners, cloud database synchronization, and digital receipt dispatch via SMS or email.
+    </p>
+
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc;">
+      <p style="margin-bottom: 4px;"><strong>Project Topic:</strong> SmartBill – Smart Store Billing and Inventory Management System</p>
+      <p style="margin-bottom: 4px;"><strong>Student:</strong> RAHUL (J S RAHUL)</p>
+      <p style="margin-bottom: 4px;"><strong>USN:</strong> 25BTRPW043 (Provide your USN)</p>
+      <p style="margin-bottom: 4px;"><strong>Class/Section:</strong> CSE-PWC(A)</p>
+      <p style="margin-bottom: 4px;"><strong>Faculty Guide:</strong> Ms. Sujithra G (or your faculty guide)</p>
+    </div>
+
+    <div class="page-footer">
+      <span>Python Programming Mini Project Report</span>
+      <span>11</span>
+    </div>
+  </div>
+
+</body>
+</html>
