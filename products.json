@@ -1,0 +1,92 @@
+[
+    {
+        "id": "P101",
+        "name": "Wireless Optical Mouse",
+        "category": "Electronics",
+        "price": 499.0,
+        "stock": 25,
+        "threshold": 5,
+        "gst_rate": 18.0
+    },
+    {
+        "id": "P102",
+        "name": "Mechanical Gaming Keyboard",
+        "category": "Electronics",
+        "price": 1899.0,
+        "stock": 15,
+        "threshold": 3,
+        "gst_rate": 18.0
+    },
+    {
+        "id": "P103",
+        "name": "USB-C Fast Cable (1.5m)",
+        "category": "Electronics",
+        "price": 249.0,
+        "stock": 40,
+        "threshold": 8,
+        "gst_rate": 18.0
+    },
+    {
+        "id": "P104",
+        "name": "A4 Spiral Notebook (200p)",
+        "category": "Stationery",
+        "price": 85.0,
+        "stock": 50,
+        "threshold": 10,
+        "gst_rate": 12.0
+    },
+    {
+        "id": "P105",
+        "name": "Gel Pen Set (Pack of 5)",
+        "category": "Stationery",
+        "price": 120.0,
+        "stock": 30,
+        "threshold": 6,
+        "gst_rate": 12.0
+    },
+    {
+        "id": "P106",
+        "name": "Royal Basmati Rice (5 kg)",
+        "category": "Groceries",
+        "price": 450.0,
+        "stock": 20,
+        "threshold": 5,
+        "gst_rate": 5.0
+    },
+    {
+        "id": "P107",
+        "name": "Cold-Pressed Oil (1 L)",
+        "category": "Groceries",
+        "price": 210.0,
+        "stock": 25,
+        "threshold": 5,
+        "gst_rate": 5.0
+    },
+    {
+        "id": "P108",
+        "name": "Dark Roast Coffee (200g)",
+        "category": "Beverages",
+        "price": 290.0,
+        "stock": 20,
+        "threshold": 4,
+        "gst_rate": 5.0
+    },
+    {
+        "id": "P109",
+        "name": "Dark Chocolate Bar (100g)",
+        "category": "Confectionery",
+        "price": 95.0,
+        "stock": 45,
+        "threshold": 10,
+        "gst_rate": 18.0
+    },
+    {
+        "id": "P110",
+        "name": "Herbal Hand Sanitizer (500ml)",
+        "category": "Personal Care",
+        "price": 110.0,
+        "stock": 4,
+        "threshold": 5,
+        "gst_rate": 18.0
+    }
+]

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice {{ bill.bill_no }} - SmartBill{% endblock %}
+{% block page_title %}Invoice Details{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;" class="no-print">
+    <a href="{{ url_for('bills') }}" class="btn btn-secondary">← Back to Bill History</a>
+    <button type="button" class="btn btn-primary" onclick="window.print()">
+      🖨️ Print Receipt
+    </button>
+  </div>
+
+  <div class="card" style="padding: 10px;">
+    <div class="receipt-paper">
+      <div class="receipt-header">
+        <h3>SMARTBILL</h3>
+        <p style="font-size: 0.82rem; margin-top: 2px; font-weight: bold;">SMART STORE BILLING & INVENTORY SYSTEM</p>
+        <p style="font-size: 0.75rem; color: #555;">123 College Road, Silicon Corridor | Phone: +91 98765 43210</p>
+        <p style="font-size: 0.72rem; color: #555;">GSTIN: 29ABCDE1234F1Z5</p>
+      </div>
+
+      <div class="receipt-divider"></div>
+
+      <div style="font-size: 0.82rem; display: flex; justify-content: space-between;">
+        <span><strong>Bill No:</strong> {{ bill.bill_no }}</span>
+        <span><strong>Date:</strong> {{ bill.date }}</span>
+      </div>
+      <div style="font-size: 0.82rem; display: flex; justify-content: space-between; margin-top: 2px;">
+        <span><strong>Customer:</strong> {{ bill.customer_name }}</span>
+        <span><strong>Time:</strong> {{ bill.time }}</span>
+      </div>
+      <div style="font-size: 0.82rem; margin-top: 2px;">
+        <span><strong>Phone:</strong> {{ bill.customer_phone }}</span>
+      </div>
+
+      <div class="receipt-divider"></div>
+
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th>Item Description</th>
+            <th style="text-align: center;">Qty</th>
+            <th style="text-align: right;">Price</th>
+            <th style="text-align: right;">GST</th>
+            <th style="text-align: right;">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in bill.items %}
+            <tr>
+              <td>{{ item.product_name }} <span style="font-size: 0.75rem; color: #555;">({{ item.product_code }})</span></td>
+              <td style="text-align: center;">{{ item.quantity }}</td>
+              <td style="text-align: right;">{{ "%.2f"|format(item.selling_price) }}</td>
+              <td style="text-align: right;">{{ item.gst_rate }}%</td>
+              <td style="text-align: right; font-weight: bold;">{{ "%.2f"|format(item.item_total) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="receipt-divider"></div>
+
+      <div class="receipt-totals-row">
+        <span>Gross Subtotal</span>
+        <span>Rs. {{ "%.2f"|format(bill.subtotal) }}</span>
+      </div>
+
+      <div class="receipt-totals-row" style="color: #059669;">
+        <span>Total Discount Applied</span>
+        <span>-Rs. {{ "%.2f"|format(bill.discount) }}</span>
+      </div>
+
+      <div class="receipt-totals-row">
+        <span>Net Taxable Value</span>
+        <span>Rs. {{ "%.2f"|format(bill.taxable_amount) }}</span>
+      </div>
+
+      <div class="receipt-totals-row">
+        <span>Total GST Amount</span>
+        <span>Rs. {{ "%.2f"|format(bill.total_gst) }}</span>
+      </div>
+
+      <div class="receipt-totals-row receipt-grand-total">
+        <span>GRAND TOTAL</span>
+        <span>Rs. {{ "%.2f"|format(bill.grand_total) }}</span>
+      </div>
+
+      <div class="receipt-totals-row">
+        <span>Payment Method</span>
+        <span>{{ bill.payment_mode }}</span>
+      </div>
+      <div class="receipt-totals-row">
+        <span>Amount Tendered</span>
+        <span>Rs. {{ "%.2f"|format(bill.amount_paid) }}</span>
+      </div>
+
+      {% if bill.payment_mode == 'Cash' %}
+        <div class="receipt-totals-row" style="font-weight: bold;">
+          <span>Change Returned</span>
+          <span>Rs. {{ "%.2f"|format(bill.change_due) }}</span>
+        </div>
+      {% endif %}
+
+      {% if bill.payment_ref %}
+        <div class="receipt-totals-row" style="font-size: 0.75rem;">
+          <span>Payment Ref / Auth</span>
+          <span>{{ bill.payment_ref }}</span>
+        </div>
+      {% endif %}
+
+      <div class="receipt-divider"></div>
+
+      <div style="text-align: center; font-size: 0.8rem; margin-top: 10px;">
+        <p><strong>Thank You for Shopping with SmartBill!</strong></p>
+        <p style="font-size: 0.72rem; color: #555; margin-top: 2px;">Billed by: {{ bill.cashier }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

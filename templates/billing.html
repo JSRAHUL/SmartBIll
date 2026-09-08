@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}POS Billing - SmartBill{% endblock %}
+{% block page_title %}Point of Sale (POS) Billing{% endblock %}
+
+{% block content %}
+<div class="pos-container">
+  <!-- Left Column: Customer Details, Product Search, and Cart Table -->
+  <div>
+    <!-- Customer Information Card -->
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-header" style="padding: 14px 20px;">
+        <h3 class="card-title" style="font-size: 0.95rem;">👤 Customer Details</h3>
+        <span style="font-size: 0.78rem; color: #64748b;">Required for billing & warranty</span>
+      </div>
+      <div class="card-body" style="padding: 16px 20px;">
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 14px;">
+          <div>
+            <label class="form-label">Customer Name *</label>
+            <input type="text" id="custNameInput" class="form-control" placeholder="e.g. Rahul Sharma" required>
+          </div>
+          <div>
+            <label class="form-label">Phone (10 Digits) *</label>
+            <input type="tel" id="custPhoneInput" class="form-control" placeholder="9876543210" maxlength="10" required>
+          </div>
+          <div>
+            <label class="form-label">Email (Optional)</label>
+            <input type="email" id="custEmailInput" class="form-control" placeholder="name@example.com">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Search & Cart Card -->
+    <div class="card">
+      <div class="card-header" style="padding: 16px 20px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <h3 class="card-title" style="font-size: 1rem;">🛒 Cart Items</h3>
+          <span class="badge badge-primary" id="cartItemsCount">0</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" id="btnClearCart" style="color: #ef4444;">
+          Clear Cart
+        </button>
+      </div>
+      <div class="card-body" style="padding: 20px;">
+        <!-- Product Search & Quick Add -->
+        <div class="pos-search-wrapper">
+          <div style="display: flex; gap: 10px;">
+            <div style="flex: 1; position: relative;">
+              <input type="text" id="posSearchInput" class="form-control" 
+                     placeholder="🔍 Search product by Name, Code (e.g. P101), or Category..." autocomplete="off">
+              <!-- Live Search Dropdown -->
+              <div class="search-results-dropdown" id="searchDropdown"></div>
+            </div>
+            <select id="posCategoryFilter" class="form-control" style="width: 170px;">
+              <option value="">All Categories</option>
+              {% for cat in categories %}
+                <option value="{{ cat }}">{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Cart Table -->
+        <div class="table-responsive" style="margin-top: 14px;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Product Description</th>
+                <th>Price</th>
+                <th style="width: 130px;">Quantity</th>
+                <th style="text-align: right;">Total</th>
+                <th style="text-align: center; width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="cartTableBody">
+              <!-- Cart rows injected via billing.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty Cart Message -->
+        <div id="cartEmptyState" style="text-align: center; padding: 48px 20px; color: #64748b;">
+          <div style="font-size: 2.4rem; margin-bottom: 8px;">🛒</div>
+          <p style="font-weight: 600; font-size: 1rem;">Your cart is empty</p>
+          <p style="font-size: 0.82rem; margin-top: 4px;">Use the search bar above to add products to the customer's bill.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Order Summary & Checkout -->
+  <div>
+    <div class="order-summary-card">
+      <h3 class="card-title" style="margin-bottom: 16px; font-size: 1.15rem; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+        Bill Summary
+      </h3>
+
+      <div class="summary-row">
+        <span>Gross Subtotal</span>
+        <span id="summarySubtotal">Rs. 0.00</span>
+      </div>
+
+      <!-- Item Quantity Bulk Discount Row -->
+      <div class="summary-row discount" id="summaryQtyDiscRow" style="display: none;">
+        <span>Quantity Bulk Discount</span>
+        <span id="summaryQtyDiscount">-Rs. 0.00</span>
+      </div>
+
+      <!-- Bill Tiered Store Offer Row -->
+      <div class="summary-row discount" id="summaryBillDiscRow" style="display: none;">
+        <span id="summaryBillDiscLabel">Store Offer</span>
+        <span id="summaryBillDiscount">-Rs. 0.00</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Total Discount Applied</span>
+        <span id="summaryTotalDiscount" style="color: #10b981; font-weight: 600;">-Rs. 0.00</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Net Taxable Value</span>
+        <span id="summaryTaxable" style="font-weight: 600; color: #0f172a;">Rs. 0.00</span>
+      </div>
+
+      <div class="summary-row">
+        <span>Total GST Amount</span>
+        <span id="summaryGST">Rs. 0.00</span>
+      </div>
+
+      <!-- Grand Total -->
+      <div class="grand-total-row">
+        <span>GRAND TOTAL</span>
+        <span id="summaryGrandTotal">Rs. 0.00</span>
+      </div>
+
+      <!-- Payment Mode Selector -->
+      <div style="margin-bottom: 14px;">
+        <label class="form-label">Payment Mode</label>
+        <div class="payment-modes">
+          <button type="button" class="payment-mode-btn active" data-mode="Cash">💵 Cash</button>
+          <button type="button" class="payment-mode-btn" data-mode="UPI">📱 UPI</button>
+          <button type="button" class="payment-mode-btn" data-mode="Card">💳 Card</button>
+        </div>
+      </div>
+
+      <!-- Cash Received & Change Due -->
+      <div id="cashInputGroup">
+        <div class="form-group" style="margin-bottom: 12px;">
+          <label class="form-label" for="cashGivenInput">Cash Received (Rs.)</label>
+          <input type="number" id="cashGivenInput" class="form-control" placeholder="Enter amount tendered" min="0" step="0.01">
+        </div>
+        <div class="summary-row bold" id="changeDueRow" style="background: #f8fafc; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px;">
+          <span>Change to Return:</span>
+          <span id="changeDueDisplay" style="color: #10b981; font-size: 1.05rem;">Rs. 0.00</span>
+        </div>
+      </div>
+
+      <!-- UPI Reference Group (hidden initially) -->
+      <div id="upiInputGroup" style="display: none; margin-bottom: 14px;">
+        <label class="form-label" for="upiRefInput">UPI Transaction / UTR ID</label>
+        <input type="text" id="upiRefInput" class="form-control" placeholder="e.g. 123456789012 (optional)">
+      </div>
+
+      <!-- Card Reference Group (hidden initially) -->
+      <div id="cardInputGroup" style="display: none; margin-bottom: 14px;">
+        <label class="form-label" for="cardLast4Input">Card Last 4 Digits</label>
+        <input type="text" id="cardLast4Input" class="form-control" placeholder="e.g. 4321" maxlength="4">
+      </div>
+
+      <!-- Checkout Button -->
+      <button type="button" class="btn btn-primary" id="btnCheckout" style="width: 100%; padding: 14px; font-size: 1rem; border-radius: 8px;">
+        Complete Sale & Print Invoice
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Printable Receipt Modal -->
+<div class="modal-backdrop" id="receiptModal">
+  <div class="modal-dialog" style="max-width: 480px;">
+    <div class="modal-header">
+      <h4 class="modal-title">Customer Invoice</h4>
+      <button type="button" class="modal-close" data-modal-close>&times;</button>
+    </div>
+    <div class="modal-body" id="receiptModalContent" style="padding: 16px;">
+      <!-- Populated dynamically via billing.js -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-modal-close>Close</button>
+      <button type="button" class="btn btn-primary" onclick="printReceipt()">🖨️ Print Receipt</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/billing.js') }}"></script>
+{% endblock %}

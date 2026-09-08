@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SmartBill - Retail POS & Inventory{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <!-- Chart.js for Sales Analytics & Visual Dashboard -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">SB</div>
+        <div>
+          <div class="brand-title">SmartBill</div>
+          <div class="brand-subtitle">Retail POS System</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-category">Main Menu</div>
+        <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('billing') }}" class="nav-link {% if request.endpoint == 'billing' %}active{% endif %}">
+          <span class="nav-icon">💳</span>
+          <span>POS Billing</span>
+        </a>
+
+        <div class="nav-category">Catalogue & Stock</div>
+        <a href="{{ url_for('products') }}" class="nav-link {% if request.endpoint == 'products' %}active{% endif %}">
+          <span class="nav-icon">📦</span>
+          <span>Products</span>
+        </a>
+        <a href="{{ url_for('inventory') }}" class="nav-link {% if request.endpoint == 'inventory' %}active{% endif %}">
+          <span class="nav-icon">⚠️</span>
+          <span>Inventory</span>
+        </a>
+
+        <div class="nav-category">Store Management</div>
+        <a href="{{ url_for('customers') }}" class="nav-link {% if request.endpoint in ['customers', 'customer_bills'] %}active{% endif %}">
+          <span class="nav-icon">👥</span>
+          <span>Customers</span>
+        </a>
+        <a href="{{ url_for('bills') }}" class="nav-link {% if request.endpoint in ['bills', 'bill_detail'] %}active{% endif %}">
+          <span class="nav-icon">🧾</span>
+          <span>Bill History</span>
+        </a>
+        <a href="{{ url_for('reports') }}" class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}">
+          <span class="nav-icon">📈</span>
+          <span>Sales & Profit</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="user-avatar">
+            {{ session.get('full_name', 'U')[0] }}
+          </div>
+          <div class="user-info">
+            <div class="user-name">{{ session.get('full_name', 'User') }}</div>
+            <div class="user-role">{{ session.get('user_role', 'Staff') }}</div>
+          </div>
+          <a href="{{ url_for('logout') }}" title="Sign Out" style="color: #ef4444; font-size: 1.15rem; text-decoration: none;">⎋</a>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="main-wrapper">
+      <header class="top-navbar">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button type="button" class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+          <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+        </div>
+
+        <div class="top-actions">
+          <a href="{{ url_for('billing') }}" class="btn btn-primary btn-sm">
+            <span>+ New Bill</span>
+          </a>
+          <span class="badge badge-neutral">Role: {{ session.get('user_role', 'Staff') }}</span>
+        </div>
+      </header>
+
+      <main class="content-body">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div style="margin-bottom: 20px;">
+              {% for category, message in messages %}
+                <div class="badge badge-{{ category if category != 'error' else 'danger' }}" 
+                     style="display: block; width: 100%; padding: 12px 16px; font-size: 0.9rem; border-radius: 8px; margin-bottom: 8px; text-align: left;">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- Page Specific Content -->
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;"></div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

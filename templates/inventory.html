@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory Management - SmartBill{% endblock %}
+{% block page_title %}Inventory & Stock Control{% endblock %}
+
+{% block content %}
+<!-- Inventory Health Stat Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon info">📦</div>
+    <div class="stat-content">
+      <div class="stat-label">Total SKUs</div>
+      <div class="stat-value">{{ counts.total }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon success">✓</div>
+    <div class="stat-content">
+      <div class="stat-label">In Healthy Stock</div>
+      <div class="stat-value" style="color: #10b981;">{{ counts.healthy }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon warning">⚠️</div>
+    <div class="stat-content">
+      <div class="stat-label">Low Stock (Needs Reorder)</div>
+      <div class="stat-value" style="color: #f59e0b;">{{ counts.low }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon danger">🚫</div>
+    <div class="stat-content">
+      <div class="stat-label">Out of Stock (Depleted)</div>
+      <div class="stat-value" style="color: #ef4444;">{{ counts.out }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory Table Card -->
+<div class="card">
+  <div class="card-header">
+    <div style="display: flex; gap: 8px;">
+      <a href="{{ url_for('inventory', filter='all') }}" 
+         class="btn btn-sm {% if current_filter == 'all' %}btn-primary{% else %}btn-secondary{% endif %}">
+        All Items ({{ counts.total }})
+      </a>
+      <a href="{{ url_for('inventory', filter='low') }}" 
+         class="btn btn-sm {% if current_filter == 'low' %}btn-primary{% else %}btn-secondary{% endif %}" style="color: #d97706;">
+        ⚠️ Low Stock ({{ counts.low }})
+      </a>
+      <a href="{{ url_for('inventory', filter='out') }}" 
+         class="btn btn-sm {% if current_filter == 'out' %}btn-primary{% else %}btn-secondary{% endif %}" style="color: #dc2626;">
+        🚫 Out of Stock ({{ counts.out }})
+      </a>
+    </div>
+
+    <span style="font-size: 0.85rem; color: #64748b;">
+      Inventory is automatically deducted on every completed sale.
+    </span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Product Name</th>
+          <th>Category</th>
+          <th>Available Stock</th>
+          <th>Threshold</th>
+          <th>Status</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if products %}
+          {% for p in products %}
+            <tr>
+              <td><span class="badge badge-neutral" style="font-weight: 700;">{{ p.product_code }}</span></td>
+              <td style="font-weight: 600;">{{ p.name }}</td>
+              <td><span class="badge badge-primary">{{ p.category }}</span></td>
+              <td>
+                <span style="font-size: 1.05rem; font-weight: 700; color: {% if p.stock == 0 %}#ef4444{% elif p.stock <= p.threshold %}#f59e0b{% else %}#10b981{% endif %};">
+                  {{ p.stock }} units
+                </span>
+              </td>
+              <td style="color: #64748b;">{{ p.threshold }} units</td>
+              <td>
+                {% if p.stock == 0 %}
+                  <span class="badge badge-danger">OUT OF STOCK</span>
+                {% elif p.stock <= p.threshold %}
+                  <span class="badge badge-warning">LOW STOCK ALERT</span>
+                {% else %}
+                  <span class="badge badge-success">IN STOCK</span>
+                {% endif %}
+              </td>
+              <td style="text-align: right;">
+                <button type="button" class="btn btn-primary btn-sm" onclick="openRestockModal({{ p.id }}, '{{ p.name }}', {{ p.stock }})">
+                  + Restock
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; color: #64748b; padding: 32px;">
+              No products match the selected inventory filter.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Restock Product Modal -->
+<div class="modal-backdrop" id="restockModal">
+  <div class="modal-dialog" style="max-width: 440px;">
+    <div class="modal-header">
+      <h4 class="modal-title">Restock Inventory</h4>
+      <button type="button" class="modal-close" data-modal-close>&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('inventory_restock') }}">
+      <input type="hidden" id="restockProdId" name="product_id">
+      <div class="modal-body">
+        <p style="font-size: 0.95rem; margin-bottom: 12px;">
+          Product: <strong id="restockProdName"></strong>
+        </p>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 16px;">
+          Current On-Hand Stock: <span id="restockCurrentStock" style="font-weight: bold; color: #0f172a;"></span>
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="restockUnits">Quantity to Add to Stock *</label>
+          <input type="number" id="restockUnits" name="quantity" class="form-control" placeholder="e.g. 10 or 25" min="1" required autofocus>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-success">Confirm Restock</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function openRestockModal(id, name, currentStock) {
+    document.getElementById("restockProdId").value = id;
+    document.getElementById("restockProdName").innerText = name;
+    document.getElementById("restockCurrentStock").innerText = currentStock + " units";
+    document.getElementById("restockUnits").value = "";
+    openModal("restockModal");
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Purchase History - {{ customer.name }} - SmartBill{% endblock %}
+{% block page_title %}Customer Purchase History{% endblock %}
+
+{% block content %}
+<!-- Customer Profile Card -->
+<div class="card" style="margin-bottom: 24px;">
+  <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h2 style="font-size: 1.35rem; font-weight: 700;">{{ customer.name }}</h2>
+      <div style="color: #64748b; font-size: 0.9rem; margin-top: 4px;">
+        <span>📱 {{ customer.phone }}</span> | <span>✉️ {{ customer.email or 'No email provided' }}</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: 20px;">
+      <div style="text-align: right;">
+        <div style="font-size: 0.78rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Total Invoices</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #4f46e5;">{{ customer.bill_count }}</div>
+      </div>
+      <div style="text-align: right;">
+        <div style="font-size: 0.78rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Lifetime Spent</div>
+        <div style="font-size: 1.4rem; font-weight: 700; color: #10b981;">Rs. {{ "%.2f"|format(customer.total_purchases) }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bills Table -->
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">Completed Purchases</h3>
+    <a href="{{ url_for('customers') }}" class="btn btn-secondary btn-sm">← Back to Customers</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Bill No</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Subtotal</th>
+          <th>Discount</th>
+          <th>GST</th>
+          <th>Grand Total</th>
+          <th>Payment Mode</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if bills %}
+          {% for b in bills %}
+            <tr>
+              <td><strong style="color: #4f46e5;">{{ b.bill_no }}</strong></td>
+              <td>{{ b.bill_date }}</td>
+              <td>{{ b.bill_time }}</td>
+              <td>Rs. {{ "%.2f"|format(b.subtotal) }}</td>
+              <td style="color: #10b981;">-Rs. {{ "%.2f"|format(b.discount) }}</td>
+              <td>Rs. {{ "%.2f"|format(b.total_gst) }}</td>
+              <td style="font-weight: 700;">Rs. {{ "%.2f"|format(b.grand_total) }}</td>
+              <td>
+                <span class="badge {% if b.payment_mode == 'Cash' %}badge-success{% elif b.payment_mode == 'UPI' %}badge-primary{% else %}badge-warning{% endif %}">
+                  {{ b.payment_mode }}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <a href="{{ url_for('bill_detail', id=b.id) }}" class="btn btn-secondary btn-sm">
+                  View Receipt
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="9" style="text-align: center; color: #64748b; padding: 32px;">
+              No bills recorded for this customer yet.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SmartBill{% endblock %}
+{% block page_title %}Store Dashboard{% endblock %}
+
+{% block content %}
+<!-- KPI Stat Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon primary">💰</div>
+    <div class="stat-content">
+      <div class="stat-label">Today's Sales</div>
+      <div class="stat-value">Rs. {{ "%.2f"|format(stats.today_sales) }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon success">🧾</div>
+    <div class="stat-content">
+      <div class="stat-label">Total Bills</div>
+      <div class="stat-value">{{ stats.total_bills }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon info">📦</div>
+    <div class="stat-content">
+      <div class="stat-label">Products in Store</div>
+      <div class="stat-value">{{ stats.total_products }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon danger">⚠️</div>
+    <div class="stat-content">
+      <div class="stat-label">Low Stock Alerts</div>
+      <div class="stat-value" style="color: {% if stats.low_stock_count > 0 %}#ef4444{% else %}inherit{% endif %};">
+        {{ stats.low_stock_count }}
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon primary">👥</div>
+    <div class="stat-content">
+      <div class="stat-label">Total Customers</div>
+      <div class="stat-value">{{ stats.total_customers }}</div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon warning">🏛️</div>
+    <div class="stat-content">
+      <div class="stat-label">Total GST Collected</div>
+      <div class="stat-value">Rs. {{ "%.2f"|format(stats.total_gst) }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Layout: 2 Columns (Main Visuals + Sidebar Panels) -->
+<div style="display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 24px;">
+  <!-- Left Side: Sales Chart & Recent Bills -->
+  <div>
+    <!-- Sales Overview Graph -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">📈 Sales Revenue Trend</h3>
+        <span class="badge badge-primary">Recent 7 Days</span>
+      </div>
+      <div class="card-body">
+        <canvas id="salesTrendChart" style="max-height: 270px; width: 100%;"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent Invoices Table -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🧾 Recent Completed Invoices</h3>
+        <a href="{{ url_for('bills') }}" class="btn btn-secondary btn-sm">View All Bills →</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Bill No</th>
+              <th>Customer</th>
+              <th>Date</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if recent_bills %}
+              {% for b in recent_bills %}
+                <tr>
+                  <td><strong style="color: #4f46e5;">{{ b.bill_no }}</strong></td>
+                  <td>{{ b.customer_name }}</td>
+                  <td>{{ b.bill_date }}</td>
+                  <td style="font-weight: 700;">Rs. {{ "%.2f"|format(b.grand_total) }}</td>
+                  <td>
+                    <span class="badge {% if b.payment_mode == 'Cash' %}badge-success{% elif b.payment_mode == 'UPI' %}badge-primary{% else %}badge-warning{% endif %}">
+                      {{ b.payment_mode }}
+                    </span>
+                  </td>
+                  <td>
+                    <a href="{{ url_for('bill_detail', id=b.id) }}" class="btn btn-secondary btn-sm" title="View Details">
+                      Receipt
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" style="text-align: center; color: #64748b; padding: 24px;">
+                  No bills generated yet. Start your first transaction in <a href="{{ url_for('billing') }}">POS Billing</a>!
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Low Stock Warnings & Top Selling Products -->
+  <div>
+    <!-- Low Stock Alert Box -->
+    <div class="card" style="border-top: 3px solid #ef4444;">
+      <div class="card-header">
+        <h3 class="card-title" style="color: #b91c1c;">⚠️ Low Stock Inventory Alert</h3>
+        <a href="{{ url_for('inventory', filter='low') }}" class="btn btn-danger btn-sm">Restock List</a>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        {% if low_stock_items %}
+          <div style="divide-y: 1px solid #e2e8f0;">
+            {% for item in low_stock_items %}
+              <div style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                <div>
+                  <strong style="font-size: 0.92rem;">{{ item.name }}</strong>
+                  <div style="font-size: 0.78rem; color: #64748b;">
+                    {{ item.product_code }} | Threshold: {{ item.threshold }} units
+                  </div>
+                </div>
+                <div style="text-align: right;">
+                  <span class="badge badge-danger">
+                    {{ item.stock }} left
+                  </span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="padding: 24px; text-align: center; color: #10b981;">
+            <div style="font-size: 1.8rem; margin-bottom: 6px;">✓</div>
+            <strong>All Products Healthy!</strong>
+            <p style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">No products are below their minimum threshold.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Top Selling Products -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">🏆 Top Selling Products</h3>
+        <a href="{{ url_for('reports') }}" class="btn btn-secondary btn-sm">Analytics</a>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        {% if top_products %}
+          <div style="divide-y: 1px solid #e2e8f0;">
+            {% for prod in top_products %}
+              <div style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0;">
+                <div>
+                  <strong style="font-size: 0.92rem;">{{ prod.product_name }}</strong>
+                  <div style="font-size: 0.78rem; color: #64748b;">{{ prod.category }}</div>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-weight: 700; color: #4f46e5;">{{ prod.units_sold }} units</div>
+                  <div style="font-size: 0.75rem; color: #64748b;">Rs. {{ "%.2f"|format(prod.total_rev) }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="padding: 24px; text-align: center; color: #64748b;">
+            No sales recorded yet.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Fetch Chart.js data from API
+    fetch("/api/chart-data")
+      .then(res => res.json())
+      .then(data => {
+        const ctx = document.getElementById("salesTrendChart").getContext("2d");
+        const labels = data.sales_trend.labels.length > 0 ? data.sales_trend.labels : ["Today"];
+        const values = data.sales_trend.data.length > 0 ? data.sales_trend.data : [0];
+
+        new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: labels,
+            datasets: [{
+              label: "Daily Revenue (Rs.)",
+              data: values,
+              borderColor: "#4f46e5",
+              backgroundColor: "rgba(79, 70, 229, 0.08)",
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2,
+              pointBackgroundColor: "#4f46e5",
+              pointRadius: 4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  callback: val => "Rs. " + val
+                }
+              }
+            }
+          }
+        });
+      })
+      .catch(err => console.error("Chart load error:", err));
+  });
+</script>
+{% endblock %}

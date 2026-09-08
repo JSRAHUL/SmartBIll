@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Customers - SmartBill{% endblock %}
+{% block page_title %}Customer Directory{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <form method="GET" action="{{ url_for('customers') }}" style="display: flex; gap: 10px; flex: 1; max-width: 440px;">
+      <input type="text" name="q" value="{{ current_query }}" class="form-control" placeholder="Search by name, phone, or email...">
+      <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+
+    <button type="button" class="btn btn-primary" onclick="openModal('addCustomerModal')">
+      + Register Customer
+    </button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Customer ID</th>
+          <th>Name</th>
+          <th>Phone Number</th>
+          <th>Email Address</th>
+          <th>Total Invoices</th>
+          <th>Total Lifetime Spent</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if customers %}
+          {% for c in customers %}
+            <tr>
+              <td><span class="badge badge-neutral">C-{{ "%04d"|format(c.id) }}</span></td>
+              <td style="font-weight: 600;">{{ c.name }}</td>
+              <td><strong>{{ c.phone }}</strong></td>
+              <td style="color: #64748b;">{{ c.email or '—' }}</td>
+              <td><span class="badge badge-primary">{{ c.bill_count }} bills</span></td>
+              <td style="font-weight: 700; color: #10b981;">Rs. {{ "%.2f"|format(c.total_purchases) }}</td>
+              <td style="text-align: right;">
+                <a href="{{ url_for('customer_bills', id=c.id) }}" class="btn btn-secondary btn-sm" title="View Invoices">
+                  Bills History
+                </a>
+                <button type="button" class="btn btn-secondary btn-sm" onclick='openEditCustModal({{ c|tojson }})'>
+                  Edit
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; color: #64748b; padding: 32px;">
+              No customers found. Customers are also registered automatically during billing.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Add Customer Modal -->
+<div class="modal-backdrop" id="addCustomerModal">
+  <div class="modal-dialog" style="max-width: 460px;">
+    <div class="modal-header">
+      <h4 class="modal-title">Register New Customer</h4>
+      <button type="button" class="modal-close" data-modal-close>&times;</button>
+    </div>
+    <form method="POST" action="{{ url_for('customer_add') }}">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Ramesh Patel" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone (10 Digits) *</label>
+          <input type="tel" name="phone" class="form-control" placeholder="9876543210" maxlength="10" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" name="email" class="form-control" placeholder="name@example.com">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Customer</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Customer Modal -->
+<div class="modal-backdrop" id="editCustomerModal">
+  <div class="modal-dialog" style="max-width: 460px;">
+    <div class="modal-header">
+      <h4 class="modal-title">Edit Customer Profile</h4>
+      <button type="button" class="modal-close" data-modal-close>&times;</button>
+    </div>
+    <form id="editCustForm" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" id="editCustName" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone (10 Digits) *</label>
+          <input type="tel" id="editCustPhone" name="phone" class="form-control" maxlength="10" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" id="editCustEmail" name="email" class="form-control">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function openEditCustModal(cust) {
+    document.getElementById("editCustForm").action = `/customers/edit/${cust.id}`;
+    document.getElementById("editCustName").value = cust.name;
+    document.getElementById("editCustPhone").value = cust.phone;
+    document.getElementById("editCustEmail").value = cust.email || "";
+    openModal("editCustomerModal");
+  }
+</script>
+{% endblock %}

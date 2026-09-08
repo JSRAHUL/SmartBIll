@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Bill History - SmartBill{% endblock %}
+{% block page_title %}Invoice & Bill History{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <form method="GET" action="{{ url_for('bills') }}" style="display: flex; gap: 12px; flex: 1; flex-wrap: wrap;">
+      <input type="text" name="q" value="{{ current_query }}" class="form-control" placeholder="Search by Bill No, Customer Name, or Phone..." style="max-width: 360px;">
+      <input type="date" name="date" value="{{ current_date }}" class="form-control" style="max-width: 170px;">
+      <button type="submit" class="btn btn-secondary">Filter</button>
+      {% if current_query or current_date %}
+        <a href="{{ url_for('bills') }}" class="btn btn-secondary">Reset</a>
+      {% endif %}
+    </form>
+
+    <a href="{{ url_for('billing') }}" class="btn btn-primary">
+      + Create New Bill
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Bill No</th>
+          <th>Date & Time</th>
+          <th>Customer Name</th>
+          <th>Customer Phone</th>
+          <th>Subtotal</th>
+          <th>Discount</th>
+          <th>GST</th>
+          <th>Grand Total</th>
+          <th>Payment</th>
+          <th style="text-align: right;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if bills %}
+          {% for b in bills %}
+            <tr>
+              <td><strong style="color: #4f46e5;">{{ b.bill_no }}</strong></td>
+              <td>{{ b.bill_date }} <span style="font-size: 0.78rem; color: #64748b;">{{ b.bill_time }}</span></td>
+              <td style="font-weight: 600;">{{ b.customer_name }}</td>
+              <td>{{ b.customer_phone }}</td>
+              <td>Rs. {{ "%.2f"|format(b.subtotal) }}</td>
+              <td style="color: #10b981;">
+                {% if b.discount > 0 %}-Rs. {{ "%.2f"|format(b.discount) }}{% else %}Rs. 0.00{% endif %}
+              </td>
+              <td>Rs. {{ "%.2f"|format(b.total_gst) }}</td>
+              <td style="font-weight: 800; color: #0f172a;">Rs. {{ "%.2f"|format(b.grand_total) }}</td>
+              <td>
+                <span class="badge {% if b.payment_mode == 'Cash' %}badge-success{% elif b.payment_mode == 'UPI' %}badge-primary{% else %}badge-warning{% endif %}">
+                  {{ b.payment_mode }}
+                </span>
+              </td>
+              <td style="text-align: right;">
+                <a href="{{ url_for('bill_detail', id=b.id) }}" class="btn btn-secondary btn-sm">
+                  View Receipt
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="10" style="text-align: center; color: #64748b; padding: 32px;">
+              No invoices found. Generate a bill from the <a href="{{ url_for('billing') }}">POS Billing</a> screen.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
