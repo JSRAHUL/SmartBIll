@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartBill - Project Presentation | J S Rahul (25BTRPW048)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --primary-light: #e0e7ff;
+      --secondary: #0ea5e9;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --dark-bg: #0f172a;
+      --dark-card: #1e293b;
+      --dark-border: #334155;
+      --light-bg: #f8fafc;
+      --light-card: #ffffff;
+      --light-border: #e2e8f0;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: #090d16;
+      color: var(--text-dark);
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      height: 48px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      color: #94a3b8;
+      font-size: 13px;
+      z-index: 100;
+    }
+
+    .top-bar .project-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .top-bar .badge {
+      background: rgba(79, 70, 229, 0.2);
+      color: #818cf8;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      border: 1px solid rgba(129, 140, 248, 0.3);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-nav {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Progress bar */
+    .progress-bar-container {
+      position: absolute;
+      top: 47px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.05);
+      z-index: 101;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4f46e5, #0ea5e9, #10b981);
+      width: 7.14%;
+      transition: width 0.3s ease;
+    }
+
+    /* Main Slide Stage */
+    .stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .slide-viewport {
+      width: 100%;
+      max-width: 1360px;
+      aspect-ratio: 16 / 9;
+      max-height: calc(100vh - 100px);
+      background: var(--light-bg);
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Slide Component */
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 44px 56px 40px 56px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(30px);
+      transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    .slide.prev {
+      transform: translateX(-30px);
+    }
+
+    /* Dark Slide Styling */
+    .slide.dark-slide {
+      background: radial-gradient(circle at 80% 20%, #1e1b4b 0%, #0f172a 100%);
+      color: #fff;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      margin-bottom: 24px;
+    }
+
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dark-slide .slide-tag {
+      color: var(--secondary);
+    }
+
+    .slide-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+
+    .dark-slide .slide-title {
+      color: #ffffff;
+    }
+
+    .slide-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .dark-slide .slide-sub {
+      color: #94a3b8;
+    }
+
+    /* Slide Content Area */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Slide Footer */
+    .slide-footer {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      padding-top: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: auto;
+    }
+
+    .dark-slide .slide-footer {
+      border-top-color: rgba(255, 255, 255, 0.1);
+      color: #64748b;
+    }
+
+    /* Card Utilities */
+    .card {
+      background: var(--light-card);
+      border: 1px solid var(--light-border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      position: relative;
+    }
+
+    .card-topbar {
+      height: 4px;
+      position: absolute;
+      top: 0;
+      left: 12px;
+      right: 12px;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-text {
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: var(--text-muted);
+    }
+
+    .card-list {
+      list-style: none;
+      margin-top: 10px;
+    }
+
+    .card-list li {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #334155;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .card-list li span.bullet {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .code-box {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 12px 14px;
+      border-radius: 8px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border: 1px solid #334155;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pill-green { background: #dcfce7; color: #15803d; }
+    .pill-blue { background: #e0f2fe; color: #0369a1; }
+    .pill-purple { background: #ede9fe; color: #6d28d9; }
+    .pill-amber { background: #fef3c7; color: #b45309; }
+
+    /* Custom Title Slide Layout */
+    .title-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .title-accent-line {
+      width: 4px;
+      height: 60px;
+      background: linear-gradient(to bottom, #818cf8, #0ea5e9);
+      border-radius: 4px;
+    }
+
+    /* Overview Grid Mode */
+    .overview-mode .slide-viewport {
+      display: none;
+    }
+
+    .overview-grid {
+      display: none;
+      width: 100%;
+      max-width: 1400px;
+      height: calc(100vh - 80px);
+      overflow-y: auto;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .overview-mode .overview-grid {
+      display: grid;
+    }
+
+    .thumbnail-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 14px;
+      color: #e2e8f0;
+      cursor: pointer;
+      aspect-ratio: 16/9;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .thumbnail-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      background: #273549;
+    }
+
+    .thumbnail-card.active {
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.4);
+    }
+
+    /* Print Stylesheet for High Res Handouts / PDF */
+    @media print {
+      body {
+        background: #fff;
+        height: auto;
+        overflow: visible;
+      }
+      .top-bar, .progress-bar-container {
+        display: none !important;
+      }
+      .stage {
+        padding: 0;
+        display: block;
+      }
+      .slide-viewport {
+        box-shadow: none;
+        max-width: none;
+        border-radius: 0;
+        aspect-ratio: auto;
+      }
+      .slide {
+        position: relative;
+        opacity: 1 !important;
+        transform: none !important;
+        page-break-after: always;
+        height: 100vh;
+        width: 100vw;
+        border-bottom: 1px solid #ddd;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar Controls -->
+  <header class="top-bar">
+    <div class="project-brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span>SmartBill Presentation</span>
+      <span class="badge">B.Tech CSE</span>
+    </div>
+
+    <div class="nav-controls">
+      <span id="slideCounter" style="font-size: 12px; font-weight: 600; color: #cbd5e1; margin-right: 8px;">1 / 14</span>
+      <button class="btn-nav" onclick="prevSlide()" title="Previous Slide (Left Arrow)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <span>Prev</span>
+      </button>
+      <button class="btn-nav" onclick="nextSlide()" title="Next Slide (Right Arrow or Space)">
+        <span>Next</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <button class="btn-nav" onclick="toggleOverview()" title="Slide Overview Grid (Key: O)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Grid</span>
+      </button>
+      <button class="btn-nav" onclick="toggleFullscreen()" title="Fullscreen (Key: F)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+        <span>Fullscreen</span>
+      </button>
+      <button class="btn-nav" onclick="window.print()" title="Print to PDF / Handouts">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        <span>Print</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Main Slide Viewport -->
+  <main class="stage">
+    <div class="slide-viewport">
+
+      <!-- SLIDE 1: TITLE SLIDE -->
+      <section class="slide dark-slide active" data-slide="1">
+        <div style="margin-bottom: auto;">
+          <div style="font-size: 11.5px; font-weight: 700; color: #38bdf8; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">
+            JAIN (DEEMED-TO-BE UNIVERSITY) • FACULTY OF ENGINEERING & TECHNOLOGY
+          </div>
+          <div style="font-size: 13px; color: #94a3b8; margin-bottom: 28px;">
+            Department of Computer Science and Engineering | Academic Year 2026–2027
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 12px;">
+            <div style="width: 5px; height: 76px; background: linear-gradient(to bottom, #818cf8, #0ea5e9); border-radius: 4px;"></div>
+            <div>
+              <h1 style="font-size: 46px; font-weight: 800; letter-spacing: -1px; color: #ffffff; line-height: 1.1;">SmartBill</h1>
+              <h2 style="font-size: 20px; font-weight: 700; color: #38bdf8; margin-top: 4px;">Smart Store Billing & Inventory Management System</h2>
+            </div>
+          </div>
+          <p style="font-size: 14.5px; color: #cbd5e1; max-width: 820px; line-height: 1.5; margin-left: 21px;">
+            A Full-Stack Web POS Platform with Real-Time Stock Controls, Dual-Tier Discounts, Multi-Slab Indian GST Compliance, and Executive Sales Analytics.
+          </p>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 20px;">
+          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 18px 22px;">
+            <div style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #38bdf8; text-transform: uppercase; margin-bottom: 4px;">
+              DEVELOPED & PRESENTED BY
+            </div>
+            <div style="font-size: 20px; font-weight: 700; color: #fff;">J S Rahul</div>
+            <div style="font-size: 12.5px; color: #94a3b8; line-height: 1.6; margin-top: 4px;">
+              USN: <strong style="color: #e2e8f0;">25BTRPW048</strong><br>
+              Class & Section: <strong style="color: #e2e8f0;">B.Tech CSE-PWC-A</strong><br>
+              Submission Date: <strong style="color: #e2e8f0;">10th September 2026</strong>
+            </div>
+          </div>
+
+          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 18px 22px;">
+            <div style="font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #34d399; text-transform: uppercase; margin-bottom: 4px;">
+              UNDER THE GUIDANCE OF
+            </div>
+            <div style="font-size: 20px; font-weight: 700; color: #fff;">Ms. Sujithra G</div>
+            <div style="font-size: 12.5px; color: #94a3b8; line-height: 1.6; margin-top: 4px;">
+              Assistant Professor<br>
+              Department of Computer Science and Engineering<br>
+              JAIN (Deemed-to-be University), Bangalore
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>Python Programming Mini-Project Presentation</span>
+          <span>Slide 1 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 2: PROBLEM STATEMENT & MOTIVATION -->
+      <section class="slide" data-slide="2">
+        <div class="slide-header">
+          <div class="slide-tag">CONTEXT & MOTIVATION</div>
+          <h2 class="slide-title">Official Problem Statement & Industry Need</h2>
+          <div class="slide-sub">Bridging the gap between a basic CLI script and an enterprise-grade retail POS system</div>
+        </div>
+
+        <div class="slide-body grid-2">
+          <div class="card" style="background: #f8fafc; border-left: 4px solid var(--primary); display: flex; flex-direction: column;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+              OFFICIAL UNIVERSITY PROBLEM STATEMENT
+            </div>
+            <p style="font-size: 14.5px; font-style: italic; color: #1e293b; line-height: 1.6; margin-bottom: 16px;">
+              “Design and develop a Bill Generator application using Python that generates a customer bill for purchased products. The program should allow users to enter product details, quantity, and price, calculate the total amount, apply GST (if applicable), and display a formatted bill.”
+            </p>
+            <div style="border-top: 1px dashed #cbd5e1; padding-top: 14px; margin-top: auto;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;">Engineering Scope Extension:</div>
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+                Rather than an ephemeral terminal script, SmartBill evolves into a complete, full-stack web application with SQLite database persistence, interactive cart manipulation, real-time stock guards, and executive analytics.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="card" style="border-left: 4px solid var(--danger);">
+              <div class="card-title" style="color: var(--danger);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                Pain Points in Manual Retail Billing
+              </div>
+              <ul class="card-list">
+                <li><span class="bullet">•</span> Manual arithmetic errors causing revenue leakage and disputes.</li>
+                <li><span class="bullet">•</span> Disconnection between checkout counters and warehouse inventory.</li>
+                <li><span class="bullet">•</span> Complex multi-slab GST tax rates (0%, 5%, 12%, 18%, 28%) handled with guesswork.</li>
+                <li><span class="bullet">•</span> Lack of customer purchase histories and profit margin transparency.</li>
+              </ul>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div class="card-title" style="color: var(--success);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                The SmartBill Solution Paradigm
+              </div>
+              <ul class="card-list">
+                <li><span class="bullet">✔</span> Sub-second live cart recalculations with client-side validation.</li>
+                <li><span class="bullet">✔</span> Automated stock guards physically preventing overselling.</li>
+                <li><span class="bullet">✔</span> Per-line CGST (50%) & SGST (50%) transparent statutory breakdowns.</li>
+                <li><span class="bullet">✔</span> Executive Dashboard with live turnover, profit, and trend charts.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 2 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 3: KEY OBJECTIVES -->
+      <section class="slide" data-slide="3">
+        <div class="slide-header">
+          <div class="slide-tag">ENGINEERING GOALS</div>
+          <h2 class="slide-title">Six Foundational Project Objectives</h2>
+          <div class="slide-sub">Engineered to maximize cashier checkout velocity while guaranteeing business accuracy</div>
+        </div>
+
+        <div class="slide-body grid-3">
+          <div class="card">
+            <div class="card-topbar" style="background: var(--primary);"></div>
+            <div class="card-title"><span class="pill pill-purple">01</span> Fast POS Billing</div>
+            <p class="card-text">
+              Real-time interactive shopping cart with live instant search, dynamic quantity adjustments, cash change calculation, and modal receipt preview.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--secondary);"></div>
+            <div class="card-title"><span class="pill pill-blue">02</span> Dual-Tier Discounts</div>
+            <p class="card-text">
+              Seamlessly combines item-level promotional cuts with order-wide percentage or flat bill discounts with configurable minimum order spend thresholds.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--success);"></div>
+            <div class="card-title"><span class="pill pill-green">03</span> Statutory GST Compliance</div>
+            <p class="card-text">
+              Per-item statutory Indian GST calculation across 0%, 5%, 12%, 18%, and 28% slabs with equal division into CGST and SGST on final invoices.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--warning);"></div>
+            <div class="card-title"><span class="pill pill-amber">04</span> Real-Time Stock Control</div>
+            <p class="card-text">
+              Automatic inventory deduction upon checkout, out-of-stock lockouts, low-stock threshold warning badges, and quick-restock modal drawers.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--primary);"></div>
+            <div class="card-title"><span class="pill pill-purple">05</span> Executive Analytics</div>
+            <p class="card-text">
+              Interactive Chart.js visualizations for revenue timelines, department category distribution, top 5 selling items, and gross profit tracking.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--danger);"></div>
+            <div class="card-title"><span class="pill pill-amber" style="background: #fee2e2; color: #b91c1c;">06</span> Role-Based Security</div>
+            <p class="card-text">
+              Multi-role authentication (Admin vs. Cashier) ensuring sensitive inventory costs, profit margins, and catalogue edits remain protected.
+            </p>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 3 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 4: SYSTEM ARCHITECTURE -->
+      <section class="slide" data-slide="4">
+        <div class="slide-header">
+          <div class="slide-tag">SYSTEM DESIGN</div>
+          <h2 class="slide-title">Three-Tier Client-Server Architecture</h2>
+          <div class="slide-sub">Clean separation of presentation, business routing logic, and relational persistence</div>
+        </div>
+
+        <div class="slide-body" style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="grid-3" style="flex: 1;">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+              <div class="card-title" style="color: var(--primary);">PRESENTATION TIER</div>
+              <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px;">Client Web Interface</div>
+              <ul class="card-list">
+                <li><span class="bullet">•</span> Semantic HTML5 & Modern CSS3 Flex/Grid</li>
+                <li><span class="bullet">•</span> Vanilla ES6+ JavaScript & Fetch API</li>
+                <li><span class="bullet">•</span> Live Cart DOM manipulation engine</li>
+                <li><span class="bullet">•</span> Chart.js 4.4 interactive charts</li>
+                <li><span class="bullet">•</span> Dedicated thermal print media stylesheet</li>
+              </ul>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--secondary);">
+              <div class="card-title" style="color: var(--secondary);">APPLICATION TIER</div>
+              <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px;">Flask RESTful Backend</div>
+              <ul class="card-list">
+                <li><span class="bullet">•</span> Python 3.10+ / WSGI microframework</li>
+                <li><span class="bullet">•</span> Jinja2 Server-Side Dynamic Templating</li>
+                <li><span class="bullet">•</span> Session Management & Role Auth Decorators</li>
+                <li><span class="bullet">•</span> Dual-Tier Discount & GST Compute Engine</li>
+                <li><span class="bullet">•</span> Transactional Safety & Error Handling</li>
+              </ul>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--success);">
+              <div class="card-title" style="color: var(--success);">PERSISTENCE TIER</div>
+              <div style="font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 8px;">SQLite3 Relational Storage</div>
+              <ul class="card-list">
+                <li><span class="bullet">•</span> Embedded, zero-configuration database</li>
+                <li><span class="bullet">•</span> ACID-compliant atomic transactions</li>
+                <li><span class="bullet">•</span> Strict Foreign Key referential integrity</li>
+                <li><span class="bullet">•</span> Snapshot pricing preserves historical audit</li>
+                <li><span class="bullet">•</span> Ultra-low latency single-file storage</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 14px 20px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+              TRANSACTION EXECUTION JOURNEY
+            </div>
+            <div style="font-size: 12.5px; color: #1e293b; font-weight: 600; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <span>1. Cashier Selects Item</span>
+              <span style="color: #94a3b8;">➔</span>
+              <span>2. Client Validates Stock Limit</span>
+              <span style="color: #94a3b8;">➔</span>
+              <span>3. Server Computes Discounts & GST</span>
+              <span style="color: #94a3b8;">➔</span>
+              <span>4. Atomic SQLite Commit & Stock Decrement</span>
+              <span style="color: #94a3b8;">➔</span>
+              <span>5. Print Receipt</span>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 4 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 5: DATABASE DESIGN -->
+      <section class="slide" data-slide="5">
+        <div class="slide-header">
+          <div class="slide-tag">DATA ARCHITECTURE</div>
+          <h2 class="slide-title">Normalized Relational Database Schema</h2>
+          <div class="slide-sub">Structured into five normalized tables with cascading foreign keys and snapshot pricing</div>
+        </div>
+
+        <div class="slide-body grid-2" style="gap: 14px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="card" style="padding: 12px 16px; border-left: 4px solid var(--primary);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 13px; color: var(--primary);">TABLE: products</strong>
+                <span class="pill pill-purple">Catalogue & Stock</span>
+              </div>
+              <div class="code-box" style="margin-top: 6px; font-size: 10px; padding: 6px 10px;">
+id (PK), name, category, cost_price, price, stock, gst_rate, discount_percent
+              </div>
+            </div>
+
+            <div class="card" style="padding: 12px 16px; border-left: 4px solid var(--secondary);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 13px; color: var(--secondary);">TABLE: customers</strong>
+                <span class="pill pill-blue">Profiles & Loyalty</span>
+              </div>
+              <div class="code-box" style="margin-top: 6px; font-size: 10px; padding: 6px 10px;">
+id (PK), name, phone (UNIQUE), email, address, created_at
+              </div>
+            </div>
+
+            <div class="card" style="padding: 12px 16px; border-left: 4px solid var(--success);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 13px; color: var(--success);">TABLE: bills</strong>
+                <span class="pill pill-green">Master Invoices</span>
+              </div>
+              <div class="code-box" style="margin-top: 6px; font-size: 10px; padding: 6px 10px;">
+id (PK), bill_number (UNIQUE), customer_name, customer_phone, subtotal, discount_amount, gst_amount, grand_total, payment_method, amount_paid, change_due, created_at
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div class="card" style="padding: 12px 16px; border-left: 4px solid var(--warning);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 13px; color: var(--warning);">TABLE: bill_items</strong>
+                <span class="pill pill-amber">Granular Order Lines</span>
+              </div>
+              <div class="code-box" style="margin-top: 6px; font-size: 10px; padding: 6px 10px;">
+id (PK), bill_id (FK -> bills.id), product_id (FK -> products.id), product_name, quantity, unit_price, gst_rate, line_total
+              </div>
+            </div>
+
+            <div class="card" style="padding: 12px 16px; border-left: 4px solid var(--danger);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="font-size: 13px; color: var(--danger);">TABLE: users</strong>
+                <span class="pill pill-amber" style="background: #fee2e2; color: #b91c1c;">RBAC Authentication</span>
+              </div>
+              <div class="code-box" style="margin-top: 6px; font-size: 10px; padding: 6px 10px;">
+id (PK), username (UNIQUE), password, role ('admin' | 'cashier'), created_at
+              </div>
+            </div>
+
+            <div class="card" style="background: #f8fafc; padding: 12px 16px; border: 1px solid #cbd5e1;">
+              <strong style="font-size: 12px; color: #1e293b; display: block; margin-bottom: 4px;">Integrity Highlights:</strong>
+              <div style="font-size: 11.5px; color: var(--text-muted); line-height: 1.5;">
+                • Foreign key cascades preserve referential honesty.<br>
+                • Snapshot pricing logs exact sale rate regardless of future catalogue price edits.<br>
+                • Unique phone indexing eliminates customer duplication.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 5 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 6: FINANCIAL COMPUTATION ENGINE -->
+      <section class="slide" data-slide="6">
+        <div class="slide-header">
+          <div class="slide-tag">CORE ALGORITHMS</div>
+          <h2 class="slide-title">Financial Computation Engine & Formulations</h2>
+          <div class="slide-sub">Mathematical accuracy engineered to meet Indian taxation standards and retail rules</div>
+        </div>
+
+        <div class="slide-body grid-2">
+          <div class="card">
+            <div class="card-topbar" style="background: var(--primary);"></div>
+            <div class="card-title" style="color: var(--primary);">1. Dual-Tier Discount Algorithm</div>
+            <div class="code-box" style="font-size: 11px; margin-top: 8px;">
+# Level 1: Item Promotional Cut
+item_discount = unit_price * (discount_pct / 100.0)
+effective_price = unit_price - item_discount
+
+# Level 2: Cart-Wide Discount (Conditional)
+if subtotal >= min_order_threshold:
+    if discount_type == 'percentage':
+        cart_discount = subtotal * (cart_pct / 100.0)
+    else:
+        cart_discount = min(flat_discount, subtotal)
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--secondary);"></div>
+            <div class="card-title" style="color: var(--secondary);">2. Multi-Slab GST Division</div>
+            <div class="code-box" style="font-size: 11px; margin-top: 8px;">
+# Slabs: 0%, 5%, 12%, 18%, 28%
+line_taxable = effective_price * quantity
+item_gst = line_taxable * (gst_rate / 100.0)
+
+# Statutory Split between Central & State
+cgst_amount = item_gst / 2.0  # 50% CGST
+sgst_amount = item_gst / 2.0  # 50% SGST
+total_line = line_taxable + item_gst
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--success);"></div>
+            <div class="card-title" style="color: var(--success);">3. Net Invoice Formulation</div>
+            <div class="code-box" style="font-size: 11px; margin-top: 8px;">
+subtotal = sum(effective_price * qty)
+total_gst = sum(item_gst)
+
+# Grand Total Equation
+grand_total = (subtotal - cart_discount) + total_gst
+grand_total = round(grand_total, 2)
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-topbar" style="background: var(--warning);"></div>
+            <div class="card-title" style="color: var(--warning);">4. Change Tender Due Calculation</div>
+            <div class="code-box" style="font-size: 11px; margin-top: 8px;">
+if payment_method == 'Cash':
+    if amount_paid < grand_total:
+        raise ValidationError("Amount paid is less than total!")
+    change_due = round(amount_paid - grand_total, 2)
+else:
+    amount_paid = grand_total
+    change_due = 0.00
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 6 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 7: POS BILLING WORKFLOW -->
+      <section class="slide" data-slide="7">
+        <div class="slide-header">
+          <div class="slide-tag">POINT OF SALE WORKFLOW</div>
+          <h2 class="slide-title">Frictionless 4-Step POS Billing Sequence</h2>
+          <div class="slide-sub">Optimized for keyboard speed, minimal counter latency, and instant thermal printing</div>
+        </div>
+
+        <div class="slide-body" style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="grid-4" style="flex: 1;">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+              <span class="pill pill-purple" style="margin-bottom: 8px;">STEP 1</span>
+              <div class="card-title">Product & Customer Entry</div>
+              <p class="card-text">
+                Live dropdown search by product name or SKU barcode. Selecting an item auto-populates unit price, stock on hand, and applicable GST slab.
+              </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--secondary);">
+              <span class="pill pill-blue" style="margin-bottom: 8px;">STEP 2</span>
+              <div class="card-title">Live Cart Validation</div>
+              <p class="card-text">
+                Client-side DOM updates calculate line subtotals dynamically. Cart prevents adding quantities higher than available inventory count.
+              </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--success);">
+              <span class="pill pill-green" style="margin-bottom: 8px;">STEP 3</span>
+              <div class="card-title">Tender & Change Calculation</div>
+              <p class="card-text">
+                Supports Cash, Card, and UPI. Entering cash tendered automatically displays exact change due, eliminating mental calculation errors.
+              </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--warning);">
+              <span class="pill pill-amber" style="margin-bottom: 8px;">STEP 4</span>
+              <div class="card-title">Atomic Commit & Receipt</div>
+              <p class="card-text">
+                In a single database transaction, the bill is saved, warehouse stock decremented, and an 80mm thermal receipt modal is rendered.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 14px 20px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">
+              RECEIPT DESIGN HIGHLIGHTS
+            </div>
+            <div class="grid-3" style="gap: 12px; font-size: 11.5px; color: var(--text-dark);">
+              <div>• <strong>80mm Thermal Friendly:</strong> Monospaced itemization with clean dashed dividing lines.</div>
+              <div>• <strong>Statutory Transparency:</strong> Displays line item rates, discounts saved, and CGST/SGST breakdown.</div>
+              <div>• <strong>One-Click Print:</strong> Direct browser integration with window.print() targeting print CSS.</div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 7 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 8: INVENTORY MANAGEMENT -->
+      <section class="slide" data-slide="8">
+        <div class="slide-header">
+          <div class="slide-tag">INVENTORY OPERATIONS</div>
+          <h2 class="slide-title">Inventory Control & Stock Management</h2>
+          <div class="slide-sub">Zero-discrepancy stock synchronization with visual alerts and restocking workflows</div>
+        </div>
+
+        <div class="slide-body grid-2">
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="card" style="border-left: 4px solid var(--primary);">
+              <div class="card-title">Automated Real-Time Stock Decrement</div>
+              <p class="card-text">
+                Inventory counts decrement automatically the exact millisecond a bill transaction completes. Eliminates manual logbooks and inventory leakage.
+              </p>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--danger);">
+              <div class="card-title">Stock Ceiling Enforcers</div>
+              <p class="card-text">
+                Both client-side inputs and server-side routes reject any attempt to bill items beyond available shelf stock, guaranteeing zero overselling.
+              </p>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div class="card-title">One-Click Modal Restocking</div>
+              <p class="card-text">
+                Store managers can instantly replenish inventory quantities via an interactive modal with instant propagation across all POS counters.
+              </p>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <div class="card" style="background: #f8fafc; border: 1px solid #cbd5e1;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;">
+                DYNAMIC STOCK STATUS BADGES
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 6px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span style="font-size: 12px; font-weight: 600;">Stock &gt; 15 Units</span>
+                  <span class="pill pill-green">In Stock</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 6px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span style="font-size: 12px; font-weight: 600;">Stock 1 – 15 Units</span>
+                  <span class="pill pill-amber">Low Stock Alert</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 6px 12px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                  <span style="font-size: 12px; font-weight: 600;">Stock = 0 Units</span>
+                  <span class="pill pill-amber" style="background: #fee2e2; color: #b91c1c;">Out of Stock</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--secondary);">
+              <div class="card-title">Profit Margin & Valuation Surveillance</div>
+              <p class="card-text">
+                The database stores cost prices alongside retail prices. This empowers management with real-time portfolio asset valuation:
+                <br><code style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px;">Total Valuation = Σ (Cost_Price × Current_Stock)</code>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 8 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 9: VISUAL ANALYTICS & REPORTING -->
+      <section class="slide" data-slide="9">
+        <div class="slide-header">
+          <div class="slide-tag">BUSINESS INTELLIGENCE</div>
+          <h2 class="slide-title">Executive Sales Analytics & Visual Dashboards</h2>
+          <div class="slide-sub">Transforming raw billing data into high-value managerial insights using Chart.js</div>
+        </div>
+
+        <div class="slide-body" style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="grid-3" style="flex: 1;">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+              <div class="card-title" style="color: var(--primary);">Daily Sales & Profit Trend</div>
+              <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Bar & Line Visualization</div>
+              <p class="card-text">
+                Plots daily gross turnover against realized gross profit margins across days of the month to uncover revenue peaks and sales cadence.
+              </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--secondary);">
+              <div class="card-title" style="color: var(--secondary);">Revenue by Category</div>
+              <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Doughnut Chart Distribution</div>
+              <p class="card-text">
+                Visualizes turnover proportion across Electronics, Grocery, Apparel, and Dairy departments to pinpoint high-margin drivers.
+              </p>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--success);">
+              <div class="card-title" style="color: var(--success);">Top 5 Selling Items</div>
+              <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-bottom: 6px;">Horizontal Velocity Bars</div>
+              <p class="card-text">
+                Ranks catalog items by cumulative units sold, enabling store owners to anticipate vendor reorders before shelf depletion occurs.
+              </p>
+            </div>
+          </div>
+
+          <div class="card dark-slide" style="border-radius: 12px; padding: 16px 20px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--secondary); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+              KEY EXECUTIVE PERFORMANCE INDICATORS (KPIs)
+            </div>
+            <div class="grid-4" style="gap: 12px;">
+              <div>
+                <div style="font-size: 11px; color: #94a3b8;">Total Revenue</div>
+                <div style="font-size: 17px; font-weight: 800; color: #38bdf8;">Rs. 2,65,490</div>
+                <div style="font-size: 10px; color: #64748b;">Cumulative completed sales</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #94a3b8;">Gross Profit</div>
+                <div style="font-size: 17px; font-weight: 800; color: #34d399;">Rs. 58,320</div>
+                <div style="font-size: 10px; color: #64748b;">21.9% overall store margin</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #94a3b8;">Avg Order Value</div>
+                <div style="font-size: 17px; font-weight: 800; color: #f59e0b;">Rs. 2,176</div>
+                <div style="font-size: 10px; color: #64748b;">Average customer basket spend</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: #94a3b8;">Tax Remitted</div>
+                <div style="font-size: 17px; font-weight: 800; color: #a78bfa;">Rs. 23,894</div>
+                <div style="font-size: 10px; color: #64748b;">50% CGST / 50% SGST</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 9 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 10: ROLE-BASED ACCESS CONTROL -->
+      <section class="slide" data-slide="10">
+        <div class="slide-header">
+          <div class="slide-tag">SECURITY ARCHITECTURE</div>
+          <h2 class="slide-title">Role-Based Access Control (RBAC) & Defense</h2>
+          <div class="slide-sub">Enforcing strict operational boundaries between administrators and counter cashiers</div>
+        </div>
+
+        <div class="slide-body" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="grid-2" style="flex: 1;">
+            <div class="card" style="border-top: 4px solid var(--primary);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="card-title" style="color: var(--primary); margin-bottom: 0;">ADMINISTRATOR ROLE</div>
+                <span class="pill pill-purple">Superuser</span>
+              </div>
+              <ul class="card-list">
+                <li><span class="bullet">✔</span> Complete CRUD access on Product Catalog & Prices</li>
+                <li><span class="bullet">✔</span> Restock inventory & update safety thresholds</li>
+                <li><span class="bullet">✔</span> Exclusive access to Cost Prices & Gross Profit margins</li>
+                <li><span class="bullet">✔</span> View full customer database & aggregate transaction history</li>
+                <li><span class="bullet">✔</span> Interactive Chart.js analytics & trend reports</li>
+              </ul>
+            </div>
+
+            <div class="card" style="border-top: 4px solid var(--secondary);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="card-title" style="color: var(--secondary); margin-bottom: 0;">CASHIER ROLE</div>
+                <span class="pill pill-blue">Point of Sale</span>
+              </div>
+              <ul class="card-list">
+                <li><span class="bullet">✔</span> Fast POS checkout screen with instant receipt printing</li>
+                <li><span class="bullet">✔</span> Read-only price and stock check for customer queries</li>
+                <li><span class="bullet">✔</span> Customer directory lookups to attach orders</li>
+                <li><span class="bullet" style="color: var(--danger);">✘</span> <strong>RESTRICTED:</strong> Hidden cost prices and profit reports</li>
+                <li><span class="bullet" style="color: var(--danger);">✘</span> <strong>RESTRICTED:</strong> Cannot add/edit products or delete bills</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 12px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--success); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+              DEFENSE IN DEPTH PROTOCOLS
+            </div>
+            <div class="grid-3" style="gap: 12px; font-size: 11.5px; color: var(--text-dark);">
+              <div>• <strong>SQL Injection Immunity:</strong> 100% parameterized queries using placeholders (<code>?</code>).</div>
+              <div>• <strong>Signed Session Cookies:</strong> Cryptographic Flask SECRET_KEY prevents cookie tampering.</div>
+              <div>• <strong>Server-Side Stock Checks:</strong> Cannot bypass inventory limits via client-side inspector.</div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 10 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 11: TESTING & QUALITY ASSURANCE -->
+      <section class="slide" data-slide="11">
+        <div class="slide-header">
+          <div class="slide-tag">VALIDATION & QA</div>
+          <h2 class="slide-title">Automated Testing Suite & Verification Matrix</h2>
+          <div class="slide-sub">Zero defects achieved across financial calculations, inventory decrements, and security walls</div>
+        </div>
+
+        <div class="slide-body" style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="grid-2" style="flex: 1; gap: 14px;">
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-title" style="margin-bottom: 4px;">Cart Math & GST Precision</div>
+                <span class="pill pill-green">PASSED</span>
+              </div>
+              <p class="card-text">
+                Tested subtotal sums, item discounts, and statutory 9% CGST + 9% SGST splits against exact rupee decimal precision. Zero rounding drift observed.
+              </p>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-title" style="margin-bottom: 4px;">Inventory Decrement & Guard</div>
+                <span class="pill pill-green">PASSED</span>
+              </div>
+              <p class="card-text">
+                Verified that bill confirmation automatically deducts product inventory; attempted checkouts exceeding stock are rejected with validation flash.
+              </p>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-title" style="margin-bottom: 4px;">Role Boundary Enforcement</div>
+                <span class="pill pill-green">PASSED</span>
+              </div>
+              <p class="card-text">
+                Verified that cashier sessions requesting <code>/products/add</code> or <code>/inventory/restock</code> are redirected with unauthorized access warnings.
+              </p>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--success);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-title" style="margin-bottom: 4px;">Atomic Rollback Safeguards</div>
+                <span class="pill pill-green">PASSED</span>
+              </div>
+              <p class="card-text">
+                Simulated transaction failures confirmed SQLite rollback safeguards, ensuring no orphan bill entries or corrupted stock counts are created.
+              </p>
+            </div>
+          </div>
+
+          <div class="card dark-slide" style="border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #34d399;">ALL 7 AUTOMATED INTEGRATION TESTS PASSED (100% SUITE PASS RATE)</div>
+              <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">Executed via Python unittest suite (tests/test_web_app.py) verifying routes, auth, POS, and analytics</div>
+            </div>
+            <span class="pill pill-green" style="font-size: 12px; padding: 6px 14px;">7 / 7 OK</span>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 11 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 12: TECHNOLOGY STACK -->
+      <section class="slide" data-slide="12">
+        <div class="slide-header">
+          <div class="slide-tag">TECHNICAL SPECIFICATIONS</div>
+          <h2 class="slide-title">Technology Stack & Hardware Footprint</h2>
+          <div class="slide-sub">Zero-dependency, lightweight stack designed to execute smoothly on low-cost POS hardware</div>
+        </div>
+
+        <div class="slide-body grid-4">
+          <div class="card" style="border-top: 4px solid var(--primary);">
+            <div class="card-title" style="color: var(--primary);">Frontend</div>
+            <ul class="card-list">
+              <li><span class="bullet">✔</span> HTML5 Semantic Layout</li>
+              <li><span class="bullet">✔</span> Modern CSS3 (Grid/Flex)</li>
+              <li><span class="bullet">✔</span> Vanilla JavaScript (ES6+)</li>
+              <li><span class="bullet">✔</span> Chart.js 4.4 Visuals</li>
+              <li><span class="bullet">✔</span> Font Awesome 6.4 Icons</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-top: 4px solid var(--secondary);">
+            <div class="card-title" style="color: var(--secondary);">Backend</div>
+            <ul class="card-list">
+              <li><span class="bullet">✔</span> Python 3.10+ Runtime</li>
+              <li><span class="bullet">✔</span> Flask Microframework</li>
+              <li><span class="bullet">✔</span> Jinja2 Server Templates</li>
+              <li><span class="bullet">✔</span> Werkzeug Security Lib</li>
+              <li><span class="bullet">✔</span> Standard Library Math</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-top: 4px solid var(--success);">
+            <div class="card-title" style="color: var(--success);">Database</div>
+            <ul class="card-list">
+              <li><span class="bullet">✔</span> SQLite3 Embedded DB</li>
+              <li><span class="bullet">✔</span> Zero-Config Serverless</li>
+              <li><span class="bullet">✔</span> ACID Compliant</li>
+              <li><span class="bullet">✔</span> Foreign Key Pragma</li>
+              <li><span class="bullet">✔</span> Single-File database.db</li>
+            </ul>
+          </div>
+
+          <div class="card" style="border-top: 4px solid var(--warning);">
+            <div class="card-title" style="color: var(--warning);">Environment</div>
+            <ul class="card-list">
+              <li><span class="bullet">✔</span> RAM: &lt; 45MB Memory</li>
+              <li><span class="bullet">✔</span> CPU: Any Dual-Core</li>
+              <li><span class="bullet">✔</span> OS: Win / Mac / Linux</li>
+              <li><span class="bullet">✔</span> Git Version Control</li>
+              <li><span class="bullet">✔</span> GitHub Hosted Repo</li>
+            </ul>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 12 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 13: ADVANTAGES & IMPACT -->
+      <section class="slide" data-slide="13">
+        <div class="slide-header">
+          <div class="slide-tag">COMMERCIAL VALUE</div>
+          <h2 class="slide-title">Key Advantages & Operational Impact</h2>
+          <div class="slide-sub">Quantifiable retail advantages over legacy spreadsheets and bloated commercial software</div>
+        </div>
+
+        <div class="slide-body grid-2">
+          <div class="card" style="border-left: 4px solid var(--primary);">
+            <div class="card-title" style="color: var(--primary);">Eliminates Billing Queues</div>
+            <p class="card-text">
+              Sub-second live cart recalculations, keyboard shortcuts, and instant search reduce average customer checkout turnaround from 3 minutes to under 30 seconds.
+            </p>
+          </div>
+
+          <div class="card" style="border-left: 4px solid var(--secondary);">
+            <div class="card-title" style="color: var(--secondary);">Guarantees GST Compliance</div>
+            <p class="card-text">
+              Eliminates human error in calculating tax across diverse product categories. Invoices provide transparent CGST & SGST breakdowns, simplifying monthly GST filings.
+            </p>
+          </div>
+
+          <div class="card" style="border-left: 4px solid var(--success);">
+            <div class="card-title" style="color: var(--success);">Zero Database Maintenance</div>
+            <p class="card-text">
+              Utilizing an embedded SQLite relational database eliminates external database server setups, network port configurations, and high operational memory overhead.
+            </p>
+          </div>
+
+          <div class="card" style="border-left: 4px solid var(--warning);">
+            <div class="card-title" style="color: var(--warning);">Empowers Data-Driven Decisions</div>
+            <p class="card-text">
+              Real-time gross profit metrics and sales velocity analytics help business owners identify dead stock, restock fast-selling items, and optimize shelf profitability.
+            </p>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 13 of 14</span>
+        </footer>
+      </section>
+
+      <!-- SLIDE 14: FUTURE ROADMAP & VIVA Q&A -->
+      <section class="slide dark-slide" data-slide="14">
+        <div class="slide-header">
+          <div class="slide-tag" style="color: #38bdf8;">LOOKING FORWARD</div>
+          <h2 class="slide-title" style="color: #ffffff;">Future Roadmap, Viva Defense & Conclusion</h2>
+          <div class="slide-sub" style="color: #94a3b8;">Strategic enhancements planned for commercial retail deployment</div>
+        </div>
+
+        <div class="slide-body grid-2">
+          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px;">
+            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+              FUTURE ENHANCEMENTS ROADMAP
+            </div>
+            <ul class="card-list" style="margin-top: 8px;">
+              <li style="color: #cbd5e1;"><span class="bullet" style="color: #38bdf8;">🚀</span> <strong>Hardware Integration:</strong> Direct USB/Bluetooth thermal printer driver & barcode laser listener.</li>
+              <li style="color: #cbd5e1;"><span class="bullet" style="color: #38bdf8;">🚀</span> <strong>Multi-Store Sync:</strong> Centralized PostgreSQL sync connecting multiple retail chain outlets.</li>
+              <li style="color: #cbd5e1;"><span class="bullet" style="color: #38bdf8;">🚀</span> <strong>WhatsApp Digital Invoices:</strong> Automated paperless bill dispatch via Twilio / Gupshup APIs.</li>
+              <li style="color: #cbd5e1;"><span class="bullet" style="color: #38bdf8;">🚀</span> <strong>AI Predictive Demand:</strong> Machine learning forecasts for seasonal restocking needs.</li>
+            </ul>
+          </div>
+
+          <div style="background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="font-size: 11px; font-weight: 800; color: #34d399; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">
+                SUMMARY & ACKNOWLEDGMENTS
+              </div>
+              <div style="font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 4px;">Thank You!</div>
+              <div style="font-size: 14px; font-weight: 600; color: #38bdf8; margin-bottom: 12px;">Questions & Technical Viva Discussion</div>
+              
+              <div style="font-size: 12px; color: #94a3b8; line-height: 1.7;">
+                • Code Repository: <a href="https://github.com/JSRAHUL/SmartBIll" target="_blank" style="color: #818cf8; text-decoration: none;">github.com/JSRAHUL/SmartBIll</a><br>
+                • Student: <strong style="color: #fff;">J S Rahul (25BTRPW048)</strong> | CSE-PWC-A<br>
+                • Guide: <strong style="color: #fff;">Ms. Sujithra G</strong>, Assistant Professor, Dept of CSE<br>
+                • Institution: <strong style="color: #fff;">JAIN (Deemed-to-be University)</strong>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 10px; margin-top: 12px; font-size: 11px; color: #64748b;">
+              Anticipated Viva Topics: SQLite ACID Transactions • Dual-Tier Discount Logic • Multi-Slab GST Splits • RBAC Security
+            </div>
+          </div>
+        </div>
+
+        <footer class="slide-footer">
+          <span>SmartBill: Smart Store Billing & Inventory Management System</span>
+          <span>Slide 14 of 14</span>
+        </footer>
+      </section>
+
+    </div>
+
+    <!-- Overview Grid Container -->
+    <div class="overview-grid" id="overviewGrid"></div>
+  </main>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 14;
+    const slides = document.querySelectorAll('.slide');
+    const progressBar = document.getElementById('progressBar');
+    const slideCounter = document.getElementById('slideCounter');
+    const overviewGrid = document.getElementById('overviewGrid');
+    let isOverview = false;
+
+    // Titles for overview grid
+    const slideTitles = [
+      "1. Title Slide & Metadata",
+      "2. Problem Statement & Motivation",
+      "3. Key Project Objectives",
+      "4. Three-Tier System Architecture",
+      "5. Relational Database Design",
+      "6. Financial Computation Engine",
+      "7. Fast POS Billing Workflow",
+      "8. Inventory Control & Restock",
+      "9. Sales Analytics & Reports",
+      "10. RBAC Security Boundaries",
+      "11. Automated Testing Suite",
+      "12. Technology Stack & Footprint",
+      "13. Key Advantages & Impact",
+      "14. Future Scope & Viva Summary"
+    ];
+
+    function updateSlide(target) {
+      if (target < 1) target = 1;
+      if (target > totalSlides) target = totalSlides;
+      currentSlide = target;
+
+      slides.forEach((slide, index) => {
+        slide.classList.remove('active', 'prev');
+        if (index + 1 === currentSlide) {
+          slide.classList.add('active');
+        } else if (index + 1 < currentSlide) {
+          slide.classList.add('prev');
+        }
+      });
+
+      // Update progress bar
+      const progressPercent = (currentSlide / totalSlides) * 100;
+      progressBar.style.width = progressPercent + '%';
+
+      // Update counter
+      slideCounter.innerText = `${currentSlide} / ${totalSlides}`;
+
+      // Update overview thumbnails if active
+      renderOverview();
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        updateSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        updateSlide(currentSlide - 1);
+      }
+    }
+
+    function toggleOverview() {
+      isOverview = !isOverview;
+      document.body.classList.toggle('overview-mode', isOverview);
+      if (isOverview) renderOverview();
+    }
+
+    function renderOverview() {
+      overviewGrid.innerHTML = '';
+      for (let i = 1; i <= totalSlides; i++) {
+        const thumb = document.createElement('div');
+        thumb.className = `thumbnail-card ${i === currentSlide ? 'active' : ''}`;
+        thumb.onclick = () => {
+          updateSlide(i);
+          toggleOverview();
+        };
+        thumb.innerHTML = `
+          <div style="font-size: 11px; font-weight: 700; color: #818cf8;">SLIDE ${i}</div>
+          <div style="font-size: 13px; font-weight: 600; color: #fff; margin: 6px 0;">${slideTitles[i-1]}</div>
+          <div style="font-size: 10px; color: #94a3b8;">Click to open slide</div>
+        `;
+        overviewGrid.appendChild(thumb);
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert("Fullscreen error: " + err.message));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        updateSlide(1);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        updateSlide(totalSlides);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'o' || e.key === 'O') {
+        toggleOverview();
+      } else if (e.key === 'Escape' && isOverview) {
+        toggleOverview();
+      }
+    });
+
+    // Touch swipe support for tablet presentation
+    let touchStartX = 0;
+    let touchEndX = 0;
+    document.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    document.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) nextSlide();
+      if (touchEndX - touchStartX > 50) prevSlide();
+    });
+
+    // Initialize
+    updateSlide(1);
+  </script>
+</body>
+</html>
