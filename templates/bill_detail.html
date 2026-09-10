@@ -48,7 +48,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for item in bill.items %}
+          {% for item in (items or bill['items']) %}
             <tr>
               <td>{{ item.product_name }} <span style="font-size: 0.75rem; color: #555;">({{ item.product_code }})</span></td>
               <td style="text-align: center;">{{ item.quantity }}</td>

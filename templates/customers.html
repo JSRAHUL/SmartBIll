@@ -43,7 +43,7 @@
                 <a href="{{ url_for('customer_bills', id=c.id) }}" class="btn btn-secondary btn-sm" title="View Invoices">
                   Bills History
                 </a>
-                <button type="button" class="btn btn-secondary btn-sm" onclick='openEditCustModal({{ c|tojson }})'>
+                <button type="button" class="btn btn-secondary btn-sm" onclick='openEditCustModal({{ dict(c)|tojson }})'>
                   Edit
                 </button>
               </td>

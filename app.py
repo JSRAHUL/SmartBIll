@@ -26,7 +26,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(BASE_DIR, "database.db")
 
+from flask.json.provider import DefaultJSONProvider
+
+class CustomJSONProvider(DefaultJSONProvider):
+    def default(self, o):
+        if isinstance(o, sqlite3.Row):
+            return dict(o)
+        return super().default(o)
+
 app = Flask(__name__)
+app.json = CustomJSONProvider(app)
 app.config["SECRET_KEY"] = "smartbill-retail-pos-secret-key-2026"
 app.config["DATABASE"] = DATABASE
 
@@ -1159,7 +1168,7 @@ def bill_detail(id):
     if request.headers.get("X-Requested-With") == "XMLHttpRequest" or request.args.get("format") == "json":
         return jsonify(bill_dict)
 
-    return render_template("bill_detail.html", bill=bill_dict)
+    return render_template("bill_detail.html", bill=bill_dict, items=items_data)
 
 
 # ------------------------------------------------------------------------------
