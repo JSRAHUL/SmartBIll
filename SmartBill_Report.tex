@@ -307,45 +307,59 @@ Figure~\ref{fig:flowchart} outlines the operational flow of SmartBill from initi
 
 \begin{figure}[htbp]
 \centering
+\resizebox{0.92\textwidth}{!}{%
 \begin{tikzpicture}[
-    node distance=1.3cm and 2cm,
-    startstop/.style={rectangle, rounded corners, minimum width=3cm, minimum height=0.8cm, text centered, draw=accent, fill=codebg, line width=1pt},
-    process/.style={rectangle, minimum width=3.2cm, minimum height=0.8cm, text centered, draw=primary, fill=white, line width=1pt},
-    decision/.style={diamond, aspect=2, minimum width=3cm, minimum height=0.8cm, text centered, draw=accent, fill=codebg, line width=1pt},
-    arrow/.style={thick, ->, >=stealth, color=primary}
+    >=Stealth,
+    node distance=0.8cm and 1.5cm,
+    startstop/.style={rectangle, rounded corners=6pt, minimum width=3cm, minimum height=0.75cm, text centered, draw=accent, fill=codebg, font=\small\bfseries, line width=1pt},
+    process/.style={rectangle, rounded corners=2pt, minimum width=3.4cm, minimum height=0.75cm, text centered, draw=primary, fill=white, font=\footnotesize, line width=0.8pt},
+    decision/.style={diamond, aspect=2.2, minimum width=3.2cm, minimum height=0.85cm, text centered, draw=accent, fill=codebg, font=\footnotesize\bfseries, line width=1pt},
+    arrow/.style={thick, ->, color=primary}
 ]
 
+    % Top initialization nodes
     \node (start) [startstop] {Start Program};
-    \node (init) [process, below of=start] {Initialize SQLite / JSON Storage};
-    \node (auth) [process, below of=init] {Authenticate User (Admin / Cashier)};
-    \node (menu) [decision, below of=auth, yshift=-0.5cm] {Select Operation};
-    
-    \node (billing) [process, left of=menu, xshift=-3cm] {Create Bill (POS Mode)};
-    \node (cart) [process, below of=billing] {Add Item \& Validate Stock};
-    \node (calc) [process, below of=cart] {Calculate Discounts \& GST};
-    \node (commit) [process, below of=calc] {Commit Bill \& Decrement Stock};
-    
-    \node (admin) [process, right of=menu, xshift=3cm] {Catalogue / Reports / Stock};
-    \node (adminproc) [process, below of=admin] {Execute CRUD / Restock Operations};
-    
-    \node (end) [startstop, below of=menu, yshift=-4.8cm] {Exit Application};
+    \node (init) [process, below=0.6cm of start] {Initialize SQLite / JSON Storage};
+    \node (auth) [process, below=0.6cm of init] {Authenticate User (Admin / Cashier)};
+    \node (menu) [decision, below=0.75cm of auth] {Select Operation};
 
+    % Left Branch (POS Billing Workflow)
+    \node (billing) [process, below left=1.1cm and 1.3cm of menu] {Create Bill (POS Mode)};
+    \node (cart) [process, below=0.6cm of billing] {Add Item \& Validate Stock};
+    \node (calc) [process, below=0.6cm of cart] {Calculate Discounts \& GST};
+    \node (commit) [process, below=0.6cm of calc] {Commit Bill \& Decrement Stock};
+
+    % Right Branch (Admin Operations Workflow)
+    \node (admin) [process, below right=1.1cm and 1.3cm of menu] {Catalogue \& Stock Operations};
+    \node (adminproc) [process, below=0.6cm of admin] {Execute CRUD \& Restock};
+    \node (reports) [process, below=0.6cm of adminproc] {View Sales Reports \& Analytics};
+
+    % Center Exit Node
+    \node (exit) [startstop, below=3.8cm of menu] {Exit Application};
+
+    % Top Connections
     \draw [arrow] (start) -- (init);
     \draw [arrow] (init) -- (auth);
     \draw [arrow] (auth) -- (menu);
-    \draw [arrow] (menu) -| node[above, pos=0.25] {POS} (billing);
+
+    % Left Branch (POS)
+    \draw [arrow] (menu.west) -| node[above, font=\footnotesize\bfseries, color=accent] {POS} (billing.north);
     \draw [arrow] (billing) -- (cart);
     \draw [arrow] (cart) -- (calc);
     \draw [arrow] (calc) -- (commit);
-    \draw [arrow] (commit) |- (menu);
-    
-    \draw [arrow] (menu) -| node[above, pos=0.25] {Admin} (admin);
-    \draw [arrow] (admin) -- (adminproc);
-    \draw [arrow] (adminproc) |- (menu);
-    
-    \draw [arrow] (menu) -- node[right] {Exit} (end);
+    \draw [arrow] (commit.west) -- ++(-0.6,0) |- (menu.155);
 
-\end{tikzpicture}
+    % Right Branch (Admin)
+    \draw [arrow] (menu.east) -| node[above, font=\footnotesize\bfseries, color=accent] {Admin} (admin.north);
+    \draw [arrow] (admin) -- (adminproc);
+    \draw [arrow] (adminproc) -- (reports);
+    \draw [arrow] (reports.east) -- ++(0.6,0) |- (menu.25);
+
+    % Center Branch (Exit)
+    \draw [arrow] (menu.south) -- node[right, font=\footnotesize\bfseries, color=accent] {Exit} (exit.north);
+
+\end{tikzpicture}%
+}
 \caption{SmartBill Complete System Lifecycle Flowchart}
 \label{fig:flowchart}
 \end{figure}
